@@ -1,0 +1,113 @@
+/* Timetable.tsx */
+table {
+  padding: 1rem;
+  border-collapse: collapse;
+}
+
+td, th{
+  text-align: start;
+  border: 1px solid black;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+}
+
+.tableProf {
+  font-weight: 600;
+}
+
+.header {
+  display: flex;
+}
+
+.icon {
+  margin: 0 1rem 1rem auto;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.icon:hover{
+  color: rgb(48, 11, 11);
+}
+.icon:active{
+  color: rgb(77, 18, 18);
+}
+
+/* TableBuilder */ 
+
+.table-builder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  display: block;
+  margin: 0 auto;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  background-color: rgb(22, 5, 5);
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0px 3px 10px rgb(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+button:hover {
+  background-color: rgb(48, 11, 11);
+  box-shadow: 0px 5px 15px rgb(0, 0, 0, 0.4);
+}
+
+button:active {
+  background-color: rgb(77, 18, 18);
+}
+
+.teacher-branch-selector, .class-selector {
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.6rem;
+  border-radius: 4px;
+  background-color: rgba(228, 216, 198, 0.74);
+  max-width: 500px;
+}
+
+/* ProfBranchForm.tsx */
+
+.field {
+  margin: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.field input, select, label {
+  border-radius: 4px;
+  border: none;
+}
+
+.field select, input{
+  padding: 0.6rem 1.2rem;
+  margin: 0 0.2rem;
+  background-color: rgba(22, 5, 5, 0.952);
+  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
+}
+
+.field label{
+  font-weight: 600;
+  margin-right: 0.2rem;
+}
+
+.field input {
+  width: 100px;
+}
+
+.field button {
+  width: 32px;
+  height: 32px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin-left: 0.2rem;
+  
+  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
+}
