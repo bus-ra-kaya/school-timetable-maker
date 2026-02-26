@@ -1,0 +1,69 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.infoWrapper {
+  position: relative;
+}
+
+.infoWrapper button {
+ background-color: transparent;
+ border: none;
+ color: #000;
+}
+
+.infoWrapper svg {
+  width: 12px;
+  height: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip {
+  transform: translateX(-50%);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  background-color: rgba(228, 216, 198, 0.966);
+  padding: 0.4rem;
+  font-size: 11px;
+  border-radius: 4px;
+  width: 140px;
+}
+
+.tableBuilder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn {
+  display: block;
+  margin: 0 auto;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  background-color: rgb(22, 5, 5);
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0px 3px 10px rgb(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.btn:hover {
+  background-color: rgb(48, 11, 11);
+  box-shadow: 0px 5px 15px rgb(0, 0, 0, 0.4);
+}
+
+.btn:active {
+  background-color: rgb(77, 18, 18);
+}
+
+.teacherSelector, .classSelector {
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.6rem;
+  border-radius: 4px;
+  background-color: rgba(228, 216, 198, 0.74);
+  max-width: 500px;
+}

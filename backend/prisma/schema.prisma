@@ -12,3 +12,21 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Branches {
+  TURKCE
+  MATEMATIK
+  HAYAT_BILGISI
+}
+
+model teacher {
+  id        String  @id @default(cuid())
+  name      String
+  hours     Int
+  branch    Branches
+}
+
+model branch {
+  id        String  @id @default(cuid())
+  branch      Branches
+}

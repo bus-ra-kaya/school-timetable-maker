@@ -11,7 +11,7 @@ export default function Timetable({onGoBackClick}: TimeTableProps){
 
   return(
     <>
-    <div className='header'>
+    <div className='table-header'>
       <ArrowLeftFromLine className="icon" onClick={onGoBackClick}/>
     </div>
       <div>
