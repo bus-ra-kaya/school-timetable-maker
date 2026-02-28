@@ -1,7 +1,8 @@
 import s from '../../style/TableBuilder.module.css';
-import {Plus, Minus} from 'lucide-react';
-import {nanoid} from 'nanoid';
 import type {TeacherData} from '../TableBuilder';
+import {Plus, Minus} from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import {nanoid} from 'nanoid';
 
 type ProfBranchFormProps = {
   teachers: TeacherData[];
@@ -10,8 +11,15 @@ type ProfBranchFormProps = {
 
 export default function ProfBranchForm({setTeachers, teachers}: ProfBranchFormProps){
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const lastRow = containerRef.current?.lastElementChild as HTMLElement;
+    lastRow?.scrollIntoView({behavior: 'smooth', block: 'center'})
+  }, [teachers.length])
+
   const addRow = () => {
-    setTeachers(prev => [...prev, {id: nanoid(), name: '', branch: ''}])
+    setTeachers(prev => [...prev, {id: nanoid(), name: '', branch: ''}]);
   };
 
   const removeRow = (id: string) => {
@@ -27,7 +35,7 @@ export default function ProfBranchForm({setTeachers, teachers}: ProfBranchFormPr
   const branches = ['Türkçe', 'Matematik', 'İngilizce', 'Beden Eğitimi', 'Resim', 'Müzik', 'Hayat Bilgisi', 'Fen Bilgisi', 'Satranç'];
 
   return (
-    <>
+    <div ref={containerRef} className={s.formContainer}>
       {teachers.map((row) => (
         <div className="field" key={row.id}>
           <label htmlFor={`name-${row.id}`}>Öğretmen Adı: </label>
@@ -75,5 +83,5 @@ export default function ProfBranchForm({setTeachers, teachers}: ProfBranchFormPr
           </button>
         </div>
       ))}
-    </>
+    </div>
 )}

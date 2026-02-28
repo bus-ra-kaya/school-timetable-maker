@@ -1,7 +1,8 @@
 import s from '../../style/TableBuilder.module.css';
-import {Plus, Minus} from 'lucide-react';
-import { nanoid} from 'nanoid';
 import type {ClassData} from '../TableBuilder';
+import {Plus, Minus} from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { nanoid} from 'nanoid';
 
 type ClassFormProps = {
   classes: ClassData[];
@@ -9,6 +10,14 @@ type ClassFormProps = {
 }
 
 export default function ClassForm({setClasses, classes}: ClassFormProps){
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const lastRow = containerRef.current?.lastElementChild as HTMLElement;
+
+    lastRow?.scrollIntoView({behavior: 'smooth', block: 'center'});
+  }, [classes, length]);
 
   const addRow = () => {
     setClasses(prev => [...prev, {id: nanoid(), year: 1, class: ''}])
@@ -29,7 +38,7 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
   const years = [1,2,3,4,5,6,7,8,9,10,11,12];
 
   return (
-    <>
+    <div ref={containerRef} className={s.formContainer}>
     {classes.map(row => (
         <div className="field" key={row.id}>
            <label htmlFor={`year-${row.id}`}>Sınıfı: </label>
@@ -67,7 +76,7 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
           </button>
        </div>
       ))}
-    </>
+    </div>
   )
 }
 

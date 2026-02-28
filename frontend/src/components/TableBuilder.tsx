@@ -3,6 +3,7 @@ import ClassForm from './Form/ClassForm';
 import s from '../style/TableBuilder.module.css';
 import { validateData } from "../utils/validateData";
 import { createTable } from "../utils/createTable";
+import Toast from "./Toast";
 import { Info } from 'lucide-react';
 import { useEffect, useRef, useState } from "react";
 import {nanoid} from 'nanoid';
@@ -24,11 +25,6 @@ export type ClassData = {
 }
 
 export default function TableBuilder({onCreateClick}: TableBuilderProps){
-
-  const [open, setOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const tooltipRef = useRef<HTMLDivElement>(null);
   
   const [teachers, setTeachers] = useState<TeacherData[]>([
     {id: nanoid(), name: '', branch: ''},
@@ -36,6 +32,12 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
   const [classes, setClasses] = useState<ClassData[]>([
     {id: nanoid(), year: 1, class: ''},
   ]);
+
+
+  //tooltip toggle logic
+
+  const [open, setOpen] = useState<boolean>(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,10 +52,58 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open])
 
-  const onSubmit = () => {
+  // button set to loading logic
+  const [dots, setDots] = useState('.');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setDots('.');
+      return;
+    }
+    const interval = setInterval(() => {
+      setDots(prev => prev.length < 3 ? prev + '.' : '.');
+    },500);
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  // toast notification logic
+
+  const [error, setError] = useState<string | null>(null);
+
+  const [toast, setToast] = useState<{ message: string; type: 'error' | 'success';} | null>(null);
+
+  useEffect(() => {
+    if (!error) return;
+
+    setToast({
+      message: error,
+      type: 'error'
+    });
+  }, [error]);
+
+  // form subit logic
+
+  const onSubmit = async () => {
+    setError(null);
     setIsLoading(true);
-    const isValid = validateData(teachers, classes);
-   
+
+    const {result, error: validationError} = validateData(teachers, classes);
+    if(!result){setError(validationError);
+        return;
+      }
+
+    try {
+       await createTable(teachers, classes);
+      } catch (err) {
+      if(import.meta.env.NODE_ENV === 'development'){
+        console.error(err);
+      }
+      setError('Program oluşturulurken bir hata oluştu.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return(
@@ -80,7 +130,21 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
       </div>
     </div>
 
-    <button onClick={onSubmit} className={s.btn}> Program Oluştur</button>
+    <button 
+      onClick={onSubmit} 
+      className={s.btn}
+      disabled={isLoading}> {isLoading ? dots : 'Program Oluştur'}
+    </button>
+
+    {toast && (
+      <Toast
+        message={toast.message}
+        onClose={() => {setError(null); setToast(null);}}
+      />
+    )}
     </>
   )
 }
+
+
+// need to fix the button getting shorter when isLoading is true

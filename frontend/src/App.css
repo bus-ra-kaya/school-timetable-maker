@@ -98,6 +98,38 @@ td, th{
   text-align: center;
 }
 
+/* ToastNotification.tsx */ 
+
+.error {
+  background-color: #f56565;
+}
+
+.info {
+background-color: #3987c7;
+}
+
+.toastContainer {
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin: 1rem 2rem;
+  width: 250px;
+  position: fixed;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+
+.toastLine {
+  position: absolute;
+  background-color: white;
+  bottom: 0;
+  right: 0;
+  height: 3px;
+  transition: width 50ms linear;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
