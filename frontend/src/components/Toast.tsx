@@ -9,7 +9,7 @@ type ToastProps = {
 
 // not sure if info type is necessary
 
-export default function Toast({message, type = 'error', duration = 5000, onClose}: ToastProps){
+export default function Toast({message, type = 'error', duration = 4000, onClose}: ToastProps){
 
   const [progress, setProgress] = useState(100);
 

@@ -70,37 +70,28 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
 
   // toast notification logic
 
-  const [error, setError] = useState<string | null>(null);
-
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success';} | null>(null);
-
-  useEffect(() => {
-    if (!error) return;
-
-    setToast({
-      message: error,
-      type: 'error'
-    });
-  }, [error]);
 
   // form subit logic
 
   const onSubmit = async () => {
-    setError(null);
+    setToast(null);
     setIsLoading(true);
 
     const {result, error: validationError} = validateData(teachers, classes);
-    if(!result){setError(validationError);
+    if(!result && validationError)
+    {setToast({message: validationError, type: 'error'});
         return;
       }
 
     try {
        await createTable(teachers, classes);
+       setToast({message: 'Program başarıyla oluşturuldu', type: 'success'});
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
         console.error(err);
       }
-      setError('Program oluşturulurken bir hata oluştu.');
+      setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +130,7 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
     {toast && (
       <Toast
         message={toast.message}
-        onClose={() => {setError(null); setToast(null);}}
+        onClose={() => {setToast(null);}}
       />
     )}
     </>

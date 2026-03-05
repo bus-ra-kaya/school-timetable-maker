@@ -2,8 +2,8 @@
 
 export default function Footer(){
   return (
-    <div className="footer">
-      © 2026 Büşra Kaya
-    </div>
+    <footer className="footer" aria-label='site alt bilgisi'>
+      <span aria-label="Telif hakkı">©</span> 2026 Büşra Kaya
+    </footer>
   )
 }

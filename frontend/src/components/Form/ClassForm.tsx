@@ -12,12 +12,32 @@ type ClassFormProps = {
 export default function ClassForm({setClasses, classes}: ClassFormProps){
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const removeButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const prevLengthRef = useRef(classes.length);
 
   useEffect(() => {
     const lastRow = containerRef.current?.lastElementChild as HTMLElement;
 
     lastRow?.scrollIntoView({behavior: 'smooth', block: 'center'});
   }, [classes, length]);
+
+  useEffect(() => {
+    const prevLength = prevLengthRef.current;
+    const currentLength = classes.length;
+
+    if (currentLength < prevLength) {
+      const lastId = classes.at(-1)?.id;
+      const target =
+        (lastId && removeButtonRefs.current.get(lastId)) ||
+        addButtonRef.current;
+      target?.focus();
+    }
+
+    prevLengthRef.current = currentLength;
+  }, [classes]);
+
+  // need to go over the useEffect above, as well the refs used (i'm not sure if the focus works properly?)(el and ref?)
 
   const addRow = () => {
     setClasses(prev => [...prev, {id: nanoid(), year: 1, class: ''}])
@@ -38,10 +58,21 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
   const years = [1,2,3,4,5,6,7,8,9,10,11,12];
 
   return (
-    <div ref={containerRef} className={s.formContainer}>
-    {classes.map(row => (
-        <div className="field" key={row.id}>
-           <label htmlFor={`year-${row.id}`}>Sınıfı: </label>
+
+    <>
+      <div aria-live='polite' aria-atomic='true' className='sr-only'>
+           {`${classes.length} satır`}
+      </div>
+
+      <div ref={containerRef} className={s.formContainer}>
+      {classes.map(row => (
+
+        <fieldset key={row.id} className={s.fieldset}>
+          <legend className='sr-only'>
+            {row.year} {row.class ? `- ${row.class}` : '. sınıf'}
+          </legend>
+
+          <label htmlFor={`year-${row.id}`}>Sınıfı: </label>
           <select
             id={`year-${row.id}`}
             value={row.year} 
@@ -64,19 +95,31 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
             type='button'
             onClick={addRow} 
             className={s.btn}
-            aria-label='Yeni satır ekle'>
-            <Plus aria-hidden='true'/>
+            aria-label='Yeni satır ekle'
+            ref={addButtonRef}>
+            <Plus aria-hidden='true'
+            />
           </button>
           <button 
             type='button'
             onClick={() => removeRow(row.id)} 
             className={s.btn}
-            aria-label='Satırı sil'>
+            aria-label={`${row.year}. sınıf ${row.class || 'yeni'} satırını sil`}
+            disabled={classes.length === 1}
+            ref={ el => {
+              if (el){
+                removeButtonRefs.current.set(row.id, el);
+              } else {
+                removeButtonRefs.current.delete(row.id);
+              }
+            }} >
             <Minus aria-hidden='true' />
           </button>
-       </div>
-      ))}
-    </div>
+
+        </fieldset>
+        ))}
+      </div>
+    </>
   )
 }
 

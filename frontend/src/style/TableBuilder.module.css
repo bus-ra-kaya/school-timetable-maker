@@ -77,3 +77,60 @@
   max-height: 30vh;
   overflow-y: auto;
 }
+
+.fieldset {
+  border: none;
+  margin: 1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.fieldset input, select, label {
+  border-radius: 4px;
+  border: none;
+}
+
+.fieldset select, input{
+  padding: 0.6rem 1.2rem;
+  margin: 0 0.2rem;
+  background-color: rgba(22, 5, 5, 0.952);
+  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
+}
+
+.fieldset label{
+  font-weight: 600;
+  margin-right: 0.2rem;
+}
+
+.fieldset input {
+  width: 100px;
+}
+
+.fieldset button {
+  width: 32px;
+  height: 32px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin-left: 0.2rem;
+  
+  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
+}
+
+@media (max-width: 550px){
+
+  body{
+  font-size: 0.8rem;
+  }
+
+  button {
+    font-size: 0.8em;
+  }
+
+  .tableBuilder{
+    flex-direction: column;
+  }
+}
