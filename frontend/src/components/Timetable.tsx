@@ -1,10 +1,11 @@
-import { timetable } from "../tempdata/timetable";
 import {ArrowLeftFromLine} from 'lucide-react';
+import type { lessonSlot } from '../App';
 
 const HOUR_COUNT = 8;
 
 type TimeTableProps = {
   onGoBackClick: () => void;
+  timetable: lessonSlot[]
 }
 
 export default function Timetable({onGoBackClick}: TimeTableProps){
@@ -31,7 +32,7 @@ export default function Timetable({onGoBackClick}: TimeTableProps){
             return(
             <tr key={hourIndex + 1}>
               <th>{hourIndex +1}</th>
-              {timetable.map((day, dayIndex) => {
+              {Timetable.map((day, dayIndex) => {
                 return(
                   <td key={dayIndex + 1}>
                   <div className='tableProf'>{day[hourIndex].class}</div>

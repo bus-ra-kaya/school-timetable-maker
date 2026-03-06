@@ -2,8 +2,10 @@ import ProfBranchForm from "./Form/ProfBranchForm";
 import ClassForm from './Form/ClassForm';
 import s from '../style/TableBuilder.module.css';
 import { getRandomName } from "../utils/getRandomName";
+import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
 import { createTable } from "../utils/createTable";
+import type {lessonSlot} from '../App';
 import Toast from "./Toast";
 import Tooltip from "./Tooltip";
 import { Info, Dices } from 'lucide-react';
@@ -23,7 +25,12 @@ export type ClassData = {
   class: string;
 }
 
-export default function TableBuilder(){
+type TableBuilderProps = {
+  ifTableCreated: () => void;
+  setTimeTables: React.Dispatch<React.SetStateAction<lessonSlot[]>>
+}
+
+export default function TableBuilder({ifTableCreated, setTimeTables}: TableBuilderProps){
   
   const [teachers, setTeachers] = useState<TeacherData[]>([
     {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
@@ -70,7 +77,9 @@ export default function TableBuilder(){
     }
 
     try {
-       await createTable(teachers, classes);
+      const timetables = await createTable(teachers, classes);
+      setTimeTables(timetables);
+      ifTableCreated();
        lastSubmittedRef.current = { teachers, classes};
        setToast({message: 'Program başarıyla oluşturuldu', type: 'success'});
       } catch (err) {
@@ -89,6 +98,14 @@ export default function TableBuilder(){
 
   const isFormChanged = JSON.stringify({ teachers, classes }) !==
   JSON.stringify(lastSubmittedRef.current);
+
+  // generate random data
+
+  const generateFormData = () => {
+    const {teachers, classes} = getRandomData();
+    setTeachers(teachers);
+    setClasses(classes);
+  }
 
   return(
     <>
@@ -117,8 +134,8 @@ export default function TableBuilder(){
       disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
       </button>
 
-      <Tooltip text='text'>
-        <button className={s.btn}>
+      <Tooltip text='Öğretmenleri ve sınıfları otomatik oluşturur.'>
+        <button className={s.btn} onClick={() => generateFormData()}>
         <Dices />
         </button>
       </Tooltip>

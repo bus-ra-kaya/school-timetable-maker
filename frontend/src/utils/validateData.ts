@@ -20,14 +20,14 @@ export function validateData (teachers: TeacherData[], classes: ClassData[]):Val
     return {result: false, error: `${GRADE_COUNT} yıl için de ${BRANCH_COUNT}'er şube olacak şekilde eksik sınıfları ekleyiniz.`};
   }
 
+  if(classes.length > GRADE_COUNT * BRANCH_COUNT){
+    return { result: false, error: `Sistem ${GRADE_COUNT} x ${BRANCH_COUNT} şube için tasarlanmıştır. Lütfen fazladan olan sınıfları siliniz.`};
+  }
+
   const isComplete = hasAllGrades(classes);
 
   if(!isComplete){
     return {result: false, error: `${GRADE_COUNT} yıl için de ${BRANCH_COUNT}'er şube olacak şekilde eksik sınıfları ekleyiniz.`};
-  }
-
-  if(classes.length > GRADE_COUNT * BRANCH_COUNT){
-    return { result: false, error: `Sistem ${GRADE_COUNT} x ${BRANCH_COUNT} şube için tasarlanmıştır. Lütfen fazladan olan sınıfları siliniz.`};
   }
 
   const shortages = checkTeacherShortages(teachers);
@@ -60,9 +60,6 @@ const hasAllGrades = (classes: ClassData[]): boolean => {
   return true;
 }
 
-// need to go over what the reduce function does
-
-
 const checkTeacherShortages = (teachers: TeacherData[]) => {
 
   const shortages = new Set<string>();
@@ -72,38 +69,29 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
       return acc;
     },{});
 
-  const multiGradeSubjects = allSubjects.filter(s => CAN_TEACH_ALL_GRADES.has(s.name));
+  const seen = new Set<string>();
+  const multiGradeSubjects = allSubjects
+  .filter(s => CAN_TEACH_ALL_GRADES.has(s.name) && !seen.has(s.name) && seen.add(s.name));
   const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));
 
   multiGradeSubjects.forEach(s => {
-    const totalClassCount = (ELEMENTARY_GRADES.length + MIDDLE_HIGH_GRADES.length) * BRANCH_COUNT;
-    const classesPerTeacher = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const totalHours = GRADE_COUNT * BRANCH_COUNT * s.hours;
+    const needed = Math.ceil(totalHours /MAX_HOURS_PER_TEACHER);
 
-    if(!countByBranch[s.name]){
-      shortages.add(s.name);
-      return;
-    }
-    if (countByBranch[s.name] * classesPerTeacher < totalClassCount) {
+    if(!countByBranch[s.name] || countByBranch[s.name] < needed){
       shortages.add(s.name);
     }
   });
 
   gradeSpecificSubjects.forEach(s => {
-    const classesPerTeacher = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
+    const totalHours = gradeCount * BRANCH_COUNT * s.hours;
+    const needed = Math.ceil(totalHours /MAX_HOURS_PER_TEACHER);
 
-    if(!countByBranch[s.name]){
-      shortages.add(s.name);
-      return;
-    }
-
-    const grades = s.grade === 'elementary' ? ELEMENTARY_GRADES : MIDDLE_HIGH_GRADES;
-    const needed = grades.length * BRANCH_COUNT;
-    const capacity = countByBranch[s.name] * classesPerTeacher;
-
-    if (capacity < needed){
+    if(!countByBranch[s.name] || countByBranch[s.name] < needed){
       shortages.add(s.name);
     } else {
-      countByBranch[s.name] -= needed /classesPerTeacher;
+      countByBranch[s.name] -= needed;
     }
   })
 

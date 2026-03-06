@@ -16,17 +16,62 @@ datasource db {
 enum Branches {
   TURKCE
   MATEMATIK
+  INGILIZCE
+  BEDEN_EGITIMI
+  RESIM
+  MUZIK
   HAYAT_BILGISI
+  FEN_BILGISI
+  SATRANC
 }
+
+enum Grades {
+  ELEMENTARY
+  MIDDLE_HIGH
+}
+
+enum Days {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
+// debate adding contstraint to the hours teacher hours
 
 model teacher {
-  id        String  @id @default(cuid())
-  name      String
-  hours     Int
-  branch    Branches
+  id          String  @id @default(cuid())
+  name        String
+  hours       Int
+  branch      Branches
+  grade       Grades?
+  lessons     lesson[]
+
+  @@index([branch])
 }
 
-model branch {
-  id        String  @id @default(cuid())
+model lesson {
+  id          String  @id @default(cuid())
   branch      Branches
+  teacher_id  String
+  class_id    String
+  hour        Int
+  day         Days
+  teacher     teacher @relation(fields: [teacher_id], references: [id])
+  classroom   classroom @relation(fields: [class_id], references: [id])
+
+  @@unique([teacher_id,day,hour])
+  @@unique([class_id, day, hour])
+
+  @@index([teacher_id])
+  @@index([class_id])
+  @@index([day, hour])
+}
+
+model classroom {
+  id          String @id @default(cuid())
+  name        String
+  grade       Grades
+  lessons     lesson[]
 }

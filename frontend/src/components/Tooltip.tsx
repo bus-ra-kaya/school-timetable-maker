@@ -32,7 +32,7 @@ export default function Tooltip({text, children}: TooltipProps){
   return (
     <span className="infoWrapper" ref={tooltipRef}>
       <span 
-      onClick={() => setOpen(prev => !prev)}
+      onClick={() => { isHovered ? setOpen(false) : setOpen(prev => !prev)}}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
         {children}
