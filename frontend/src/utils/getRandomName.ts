@@ -1,5 +1,5 @@
-const firstNames = ["Emre", "Aylin", "Kerem", "Elif", "Burak", "Derya", "Canan", "Mert", "Selin", "Ozan"];
-const lastNames = ["Yılmaz", "Demir", "Kaya", "Şahin", "Arslan", "Öztürk", "Aydın", "Yıldırım", "Koç", "Çelik"];
+const firstNames = ["Emre", "Ekin", "Aylin", "Kerem", "Elif", "Burak", "Derya", "Canan", "Mert", "Selin", "Ozan"];
+const lastNames = ["Yılmaz", "Albeni", "Demir", "Kaya", "Şahin", "Arslan", "Öztürk", "Aydın", "Yıldırım", "Koç", "Çelik"];
 
 
 export const getRandomName = () => {

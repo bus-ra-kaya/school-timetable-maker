@@ -2,34 +2,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
+}
+.info {
+  background-color: transparent;
+  border: none;
 }
 
-.infoWrapper {
-  position: relative;
-}
-
-.infoWrapper button {
- background-color: transparent;
- border: none;
- color: #000;
-}
-
-.infoWrapper svg {
+.info svg {
   width: 12px;
   height: 12px;
   margin-bottom: 0.5rem;
-}
-
-.tooltip {
-  transform: translateX(-50%);
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  background-color: rgba(228, 216, 198, 0.966);
-  padding: 0.4rem;
-  font-size: 11px;
-  border-radius: 4px;
-  width: 140px;
+  color: black;
 }
 
 .tableBuilder {
@@ -39,10 +23,16 @@
   justify-content: center;
 }
 
+.btnContainer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  height: 45px;
+}
+
 .btn {
-  display: block;
-  margin: 0 auto;
-  padding: 0.8rem 1.6rem;
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
   background-color: rgb(22, 5, 5);
   border: none;
@@ -52,24 +42,29 @@
   transition: 0.3s ease;
 }
 
+.btn svg {
+  width: 24px;
+  height: 24px;
+}
+
 .btn:disabled {
   color: white;
 }
 
-.btn:hover {
+.btn:hover{
   background-color: rgb(48, 11, 11);
   box-shadow: 0px 5px 15px rgb(0, 0, 0, 0.4);
 }
 
-.btn:active {
+.btn:active  {
   background-color: rgb(77, 18, 18);
 }
 
 .teacherSelector, .classSelector {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   margin-bottom: 0.6rem;
   border-radius: 4px;
-  background-color: rgba(228, 216, 198, 0.74);
+  background-color: rgba(245, 227, 200, 0.74);
   max-width: 500px;
 }
 
@@ -84,6 +79,7 @@
   padding: 0;
   display: flex;
   align-items: center;
+  font-size: 1rem;
 }
 
 .fieldset input, select, label {
@@ -110,13 +106,11 @@
 .fieldset button {
   width: 32px;
   height: 32px;
-  
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
   margin-left: 0.2rem;
-  
   box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
 }
 

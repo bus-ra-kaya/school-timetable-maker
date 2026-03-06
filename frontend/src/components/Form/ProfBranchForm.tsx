@@ -10,8 +10,6 @@ type ProfBranchFormProps = {
   setTeachers: React.Dispatch<React.SetStateAction<TeacherData[]>>;
 };
 
-// need to deal with the random names being reset every render
-
 export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const removeButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -39,7 +37,7 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
   }, [teachers]);
 
   const addRow = () => {
-    setTeachers(prev => [...prev, { id: nanoid(), name: '', branch: '' }]);
+    setTeachers(prev => [...prev, { id: nanoid(), name: '', branch: '' , placeholder: getRandomName()}]);
   };
 
   const removeRow = (id: string) => {
@@ -64,11 +62,7 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
       </div>
 
       <div ref={containerRef} className={s.formContainer}>
-        {teachers.map(row => {
-
-          const randomName = getRandomName();
-
-          return(
+        {teachers.map(row => (
           <fieldset key={row.id} className={s.fieldset}>
             <legend className="sr-only">
               {row.name || 'Yeni öğretmen'}
@@ -80,7 +74,7 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
               type="text"
               id={`name-${row.id}`}
               value={row.name}
-              placeholder={randomName}
+              placeholder={row.placeholder}
               onChange={e => updateRow(row.id, 'name', e.target.value)}
             />
 
@@ -123,7 +117,7 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
               <Minus aria-hidden="true" />
             </button>
           </fieldset>
-        )})}
+        ))}
       </div>
     </>
   );

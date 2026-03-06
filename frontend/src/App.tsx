@@ -11,7 +11,7 @@ function App() {
     <div className='page'>
       <div className="main">
         {view === 'builder' && (
-        <TableBuilder onCreateClick={() => setView('timetable')} />
+        <TableBuilder />
       )}
       {view === 'timetable' && (
         <Timetable onGoBackClick={() => setView('builder')} />

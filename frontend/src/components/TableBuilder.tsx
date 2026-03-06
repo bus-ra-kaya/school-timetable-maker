@@ -1,21 +1,20 @@
 import ProfBranchForm from "./Form/ProfBranchForm";
 import ClassForm from './Form/ClassForm';
 import s from '../style/TableBuilder.module.css';
+import { getRandomName } from "../utils/getRandomName";
 import { validateData } from "../utils/validateData";
 import { createTable } from "../utils/createTable";
 import Toast from "./Toast";
-import { Info } from 'lucide-react';
+import Tooltip from "./Tooltip";
+import { Info, Dices } from 'lucide-react';
 import { useEffect, useRef, useState } from "react";
 import {nanoid} from 'nanoid';
-
-type TableBuilderProps = {
-  onCreateClick: () => void;
-}
 
 export type TeacherData = {
   id: string;
   name: string;
   branch: string;
+  placeholder: string;
 }
 
 export type ClassData = {
@@ -24,33 +23,18 @@ export type ClassData = {
   class: string;
 }
 
-export default function TableBuilder({onCreateClick}: TableBuilderProps){
+export default function TableBuilder(){
   
   const [teachers, setTeachers] = useState<TeacherData[]>([
-    {id: nanoid(), name: '', branch: ''},
+    {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
+    {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
+    {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
   ]);
   const [classes, setClasses] = useState<ClassData[]>([
     {id: nanoid(), year: 1, class: ''},
+    {id: nanoid(), year: 1, class: ''},
+    {id: nanoid(), year: 1, class: ''},
   ]);
-
-
-  //tooltip toggle logic
-
-  const [open, setOpen] = useState<boolean>(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if(tooltipRef.current && !tooltipRef.current.contains(event.target as Node)){
-        setOpen(false);
-      }
-    };
-    if(open){
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open])
 
   // button set to loading logic
   const [dots, setDots] = useState('.');
@@ -79,13 +63,15 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
     setIsLoading(true);
 
     const {result, error: validationError} = validateData(teachers, classes);
-    if(!result && validationError)
-    {setToast({message: validationError, type: 'error'});
-        return;
-      }
+    if(!result && validationError){
+      setToast({message: validationError, type: 'error'});
+      setIsLoading(false);
+      return;
+    }
 
     try {
        await createTable(teachers, classes);
+       lastSubmittedRef.current = { teachers, classes};
        setToast({message: 'Program başarıyla oluşturuldu', type: 'success'});
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
@@ -97,21 +83,24 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
     }
   }
 
+  // check if the form has been updated before reenabling the submit button
+
+  const lastSubmittedRef = useRef({teachers, classes});
+
+  const isFormChanged = JSON.stringify({ teachers, classes }) !==
+  JSON.stringify(lastSubmittedRef.current);
+
   return(
     <>
     <div className={s.tableBuilder}>
-      <div className={s.header} ref={tooltipRef}>
+      <div className={s.header}>
         <h3>Ders Programı Hazırlama</h3>
 
-        <span className={s.infoWrapper}>
-          <button onClick={() => {setOpen(prev => !prev)}} aria-label='Info'>
+        <Tooltip text="Öğretmen ve sınıf bilgilerini ekleyin, ardından Program Oluştur butonuna tıklayın. Çakışmalar otomatik olarak kontrol edilir.">
+          <button aria-label='Info' className={s.info}>
             <Info className={s.icon}/>
           </button>
-
-          { open && (
-          <span className={s.tooltip}> Öğretmen ve sınıf bilgilerini ekleyin, ardından Program Oluştur butonuna tıklayın. Çakışmalar otomatik olarak kontrol edilir. </span>
-          )}
-        </span>
+        </Tooltip>
       </div>
       <div className={s.teacherSelector}>
         <ProfBranchForm teachers={teachers} setTeachers={setTeachers} />
@@ -121,11 +110,19 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
       </div>
     </div>
 
-    <button 
+    <div className={s.btnContainer}>
+      <button 
       onClick={onSubmit} 
       className={s.btn}
-      disabled={isLoading}> {isLoading ? dots : 'Program Oluştur'}
-    </button>
+      disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
+      </button>
+
+      <Tooltip text='text'>
+        <button className={s.btn}>
+        <Dices />
+        </button>
+      </Tooltip>
+    </div>
 
     {toast && (
       <Toast
@@ -136,6 +133,3 @@ export default function TableBuilder({onCreateClick}: TableBuilderProps){
     </>
   )
 }
-
-
-// need to fix the button getting shorter when isLoading is true

@@ -1,6 +1,5 @@
 import type { TeacherData, ClassData } from "../components/TableBuilder";
 import { allSubjects } from "../data/subjects";
-import type { Subject } from "../data/subjects";
 
 const ELEMENTARY_GRADES = [1,2,3,4];
 const MIDDLE_HIGH_GRADES = [5,6,7,8,9,10,11,12];
@@ -34,10 +33,7 @@ export function validateData (teachers: TeacherData[], classes: ClassData[]):Val
   const shortages = checkTeacherShortages(teachers);
 
   if(shortages.length > 0){
-
-    const uniqueNames = [...new Set(shortages.map(s => s.name))];
-
-    return {result: false, error: `${uniqueNames.join(', ')} dersleri için eksik öğretmenler bulunmaktadır.`};
+    return {result: false, error: `${shortages.join(', ')} dersleri için eksik öğretmenler bulunmaktadır.`};
   }
   return {result: true, error: null};
 };
@@ -69,7 +65,7 @@ const hasAllGrades = (classes: ClassData[]): boolean => {
 
 const checkTeacherShortages = (teachers: TeacherData[]) => {
 
-  const shortages: Subject[] = [];
+  const shortages = new Set<string>();
   const countByBranch = teachers.reduce<Record<string, number>>(
     (acc, teacher) => {
       acc[teacher.branch] = (acc[teacher.branch] ?? 0) + 1;
@@ -81,24 +77,22 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
 
   multiGradeSubjects.forEach(s => {
     const totalClassCount = (ELEMENTARY_GRADES.length + MIDDLE_HIGH_GRADES.length) * BRANCH_COUNT;
-    const classesPerTeacher = MAX_HOURS_PER_TEACHER / s.hours;
+    const classesPerTeacher = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
 
     if(!countByBranch[s.name]){
-      shortages.push(s);
+      shortages.add(s.name);
       return;
     }
     if (countByBranch[s.name] * classesPerTeacher < totalClassCount) {
-      shortages.push(s);
-    } else {
-      countByBranch[s.name] -= totalClassCount / classesPerTeacher;
+      shortages.add(s.name);
     }
   });
 
   gradeSpecificSubjects.forEach(s => {
-    const classesPerTeacher = MAX_HOURS_PER_TEACHER / s.hours;
+    const classesPerTeacher = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
 
     if(!countByBranch[s.name]){
-      shortages.push(s);
+      shortages.add(s.name);
       return;
     }
 
@@ -107,11 +101,11 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
     const capacity = countByBranch[s.name] * classesPerTeacher;
 
     if (capacity < needed){
-      shortages.push(s);
+      shortages.add(s.name);
     } else {
-      countByBranch[s.name] -=1;
+      countByBranch[s.name] -= needed /classesPerTeacher;
     }
   })
 
-  return shortages;
+  return Array.from(shortages);
 }
