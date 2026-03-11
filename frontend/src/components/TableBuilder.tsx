@@ -1,16 +1,20 @@
+import { useEffect, useRef, useState } from "react";
+import { Info, Dices } from "lucide-react";
+import { nanoid } from "nanoid";
+
 import ProfBranchForm from "./Form/ProfBranchForm";
-import ClassForm from './Form/ClassForm';
-import s from '../style/TableBuilder.module.css';
+import ClassForm from "./Form/ClassForm";
+import Toast from "./Toast";
+import Tooltip from "./Tooltip";
+
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
-import { createTable } from "../utils/createTable";
-import type {lessonSlot} from '../App';
-import Toast from "./Toast";
-import Tooltip from "./Tooltip";
-import { Info, Dices } from 'lucide-react';
-import { useEffect, useRef, useState } from "react";
-import {nanoid} from 'nanoid';
+import { createProgram } from "../utils/createProgram";
+
+import type { lessonSlot } from "../App";
+
+import s from "../style/TableBuilder.module.css";
 
 export type TeacherData = {
   id: string;
@@ -26,11 +30,11 @@ export type ClassData = {
 }
 
 type TableBuilderProps = {
-  ifTableCreated: () => void;
+  ifProgramCreated: () => void;
   setTimeTables: React.Dispatch<React.SetStateAction<lessonSlot[]>>
 }
 
-export default function TableBuilder({ifTableCreated, setTimeTables}: TableBuilderProps){
+export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBuilderProps){
   
   const [teachers, setTeachers] = useState<TeacherData[]>([
     {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
@@ -63,7 +67,7 @@ export default function TableBuilder({ifTableCreated, setTimeTables}: TableBuild
 
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success';} | null>(null);
 
-  // form subit logic
+  // form submit logic
 
   const onSubmit = async () => {
     setToast(null);
@@ -77,14 +81,22 @@ export default function TableBuilder({ifTableCreated, setTimeTables}: TableBuild
     }
 
     try {
-      const timetables = await createTable(teachers, classes);
-      setTimeTables(timetables);
-      ifTableCreated();
-       lastSubmittedRef.current = { teachers, classes};
-       setToast({message: 'Program başarıyla oluşturuldu', type: 'success'});
+
+      const [timetables] = await Promise.all([
+        createProgram(teachers, classes),
+        new Promise(resolve => setTimeout(resolve, 1000))
+      ]);
+
+      if(!timetables.result || !timetables.data ){
+        setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
+        lastSubmittedRef.current = {teachers, classes};
+        return;
+      }
+      setTimeTables(timetables.data);
+      ifProgramCreated();
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
-        console.error(err);
+      console.error(err);
       }
       setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
     } finally {

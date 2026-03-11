@@ -30,7 +30,6 @@ export const getRandomData = () => {
   const multiGradeSubjects = allSubjects
   .filter(s => CAN_TEACH_ALL_GRADES.has(s.name) && !seen.has(s.name) && seen.add(s.name));  
   const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));
-  console.log(gradeSpecificSubjects);
 
   multiGradeSubjects.forEach(s => {
     const totalHours = GRADE_COUNT * BRANCH_COUNT * s.hours;

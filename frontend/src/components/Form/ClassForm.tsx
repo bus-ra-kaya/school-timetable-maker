@@ -72,7 +72,7 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
             {row.year} {row.class ? `- ${row.class}` : '. sınıf'}
           </legend>
 
-          <label htmlFor={`year-${row.id}`}>Sınıfı: </label>
+          <label htmlFor={`year-${row.id}`}>Sınıf: </label>
           <select
             id={`year-${row.id}`}
             value={row.year} 

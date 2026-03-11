@@ -7,8 +7,6 @@ type ToastProps = {
   onClose: () => void;
 }
 
-// not sure if info type is necessary
-
 export default function Toast({message, type = 'error', duration = 4000, onClose}: ToastProps){
 
   const [progress, setProgress] = useState(100);
@@ -20,7 +18,6 @@ export default function Toast({message, type = 'error', duration = 4000, onClose
       setProgress(prev => {
         if (prev <= 0){
           clearInterval(timer);
-          onClose();
           return 0;
         }
         return prev - step;
@@ -29,7 +26,13 @@ export default function Toast({message, type = 'error', duration = 4000, onClose
 
     return () => clearInterval(timer);
 
-  }, [onClose, duration])
+  }, [duration]);
+
+  useEffect(() => {
+    if (progress === 0) {
+      onClose();
+    }
+  }, [progress, onClose]);
 
   return (
     <div className={`toastContainer ${type}`}>
