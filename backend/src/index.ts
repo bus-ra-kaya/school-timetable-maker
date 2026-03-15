@@ -1,19 +1,26 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
+import { env } from 'node:process';
 
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(cors({
+  origin: process.env.URL,
+  methods: ['GET', 'POST'],
+}))
+
 app.use(express.json());
 
-app.get('/api/timetable', (req, res) => {});
+app.get('/api/program', (req, res) => {
+  res.status(200).json({result: true, data: tempdata, error: null});
+});
 
-app.post('/api/timetables', (req, res) => {
+app.post('/api/create-program', (req, res) => {
   const {teachers, classes} = req.body;
 
-  // res.status(200).json({result: true, data: tempdata, error: null});
-
-  res.status(200).json({result: true, data: tempdata, error: 'Sistemsel bir hata yaşandı.'});
+  res.status(200).json({result: true, data: tempdata, error: null});
 });
 
 app.get("/health", (req, res) => {

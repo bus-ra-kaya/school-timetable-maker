@@ -1,4 +1,4 @@
-import type { TeacherData, ClassData, lessonSlot } from "../types";
+import type { lessonSlot } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const NODE_MODE = import.meta.env.NODE_ENV;
@@ -9,13 +9,11 @@ type ReturnValue = {
   error: string | null;
 }
 
-export const createProgram = async (teachers: TeacherData[], classes: ClassData[]): Promise<ReturnValue> => {
+export const fetchProgram = async (): Promise<ReturnValue> => {
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/create-program`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({teachers, classes})
+    const response = await fetch(`${API_BASE_URL}/api/program`, {
+    method: 'GET'
    });
 
     if(!response.ok){

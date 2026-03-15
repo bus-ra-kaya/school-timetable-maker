@@ -1,4 +1,4 @@
-import type { TeacherData, ClassData } from "../components/TableBuilder";
+import type { TeacherData, ClassData } from "../types";
 import { getRandomName } from "./getRandomName";
 import { allSubjects } from "../data/subjects";
 import { nanoid } from 'nanoid';

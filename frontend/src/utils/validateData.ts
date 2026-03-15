@@ -1,4 +1,4 @@
-import type { TeacherData, ClassData } from "../components/TableBuilder";
+import type { TeacherData, ClassData } from "../types";
 import { allSubjects } from "../data/subjects";
 
 const ELEMENTARY_GRADES = [1,2,3,4];

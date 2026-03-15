@@ -1,20 +1,21 @@
 import {ArrowLeftFromLine} from 'lucide-react';
-import type { lessonSlot } from '../App';
-
+import type { lessonSlot } from '../types';
+import { useNavigate } from 'react-router-dom';
 const HOUR_COUNT = 8;
 const DAYS_COUNT = 5;
 
-type TimeTableProps = {
-  onGoBackClick: () => void;
-  timetable: lessonSlot[]
+type ProgramProps = {
+  program: lessonSlot[];
 }
 
-export default function Timetable({onGoBackClick, timetable}: TimeTableProps){
+export default function Program({program}: ProgramProps){
+
+  const navigate = useNavigate();
 
   return(
     <>
     <div className='table-header'>
-      <ArrowLeftFromLine className="icon" onClick={onGoBackClick}/>
+      <ArrowLeftFromLine className="icon" onClick={() => navigate('/create-program')}/>
     </div>
       <div>
       <table>
@@ -35,7 +36,7 @@ export default function Timetable({onGoBackClick, timetable}: TimeTableProps){
               {Array.from({length: DAYS_COUNT }).map((_, dayIndex) => {
 
                 const lessonIndex = (dayIndex * HOUR_COUNT) + hourIndex;
-                const lesson = timetable[lessonIndex];
+                const lesson = program[lessonIndex];
 
                 return (
                   <td key={dayIndex}>

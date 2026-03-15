@@ -1,5 +1,5 @@
 import s from '../../style/TableBuilder.module.css';
-import type { TeacherData } from '../TableBuilder';
+import type { TeacherData } from '../../types';
 import { getRandomName } from '../../utils/getRandomName';
 import { Plus, Minus } from 'lucide-react';
 import { useEffect, useRef } from 'react';

@@ -1,51 +1,65 @@
 import { useEffect, useRef, useState } from "react";
 import { Info, Dices } from "lucide-react";
 import { nanoid } from "nanoid";
-
 import ProfBranchForm from "./Form/ProfBranchForm";
 import ClassForm from "./Form/ClassForm";
 import Toast from "./Toast";
 import Tooltip from "./Tooltip";
-
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
 import { createProgram } from "../utils/createProgram";
-
-import type { lessonSlot } from "../App";
-
 import s from "../style/TableBuilder.module.css";
+import { useNavigate } from "react-router-dom";
+import type { TeacherData, ClassData, lessonSlot } from "../types";
 
-export type TeacherData = {
-  id: string;
-  name: string;
-  branch: string;
-  placeholder: string;
+type ProgramBuilderProps = {
+  onProgramCreated: (data: lessonSlot[]) => void;
 }
 
-export type ClassData = {
-  id: string;
-  year: number;
-  class: string;
-}
+export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
 
-type TableBuilderProps = {
-  ifProgramCreated: () => void;
-  setTimeTables: React.Dispatch<React.SetStateAction<lessonSlot[]>>
-}
+  // initialise teachers and classes, add the data to localStorage
 
-export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBuilderProps){
-  
-  const [teachers, setTeachers] = useState<TeacherData[]>([
+  const [teachers, setTeachers] = useState<TeacherData[]>(() => {
+    const saved = localStorage.getItem('teachers');
+    return saved ? JSON.parse(saved) : [
     {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
     {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
     {id: nanoid(), name: '', branch: '', placeholder: getRandomName()},
+  ]});
+
+  const [classes, setClasses] = useState<ClassData[]>(() => {
+    const saved = localStorage.getItem('classes');
+    return saved ? JSON.parse(saved) :  [
+    {id: nanoid(), year: 1, class: ''},
+    {id: nanoid(), year: 1, class: ''},
+    {id: nanoid(), year: 1, class: ''},
+  ]});
+
+  useEffect(() => {
+    localStorage.setItem("teachers", JSON.stringify(teachers));
+  }, [teachers]);
+
+  useEffect(() => {
+    localStorage.setItem("classes", JSON.stringify(classes));
+  }, [classes]);
+
+
+  // reset the form state 
+
+  const resetForm = () => {
+  setTeachers([
+    { id: nanoid(), name: '', branch: '', placeholder: getRandomName() },
+    { id: nanoid(), name: '', branch: '', placeholder: getRandomName() },
+    { id: nanoid(), name: '', branch: '', placeholder: getRandomName() },
   ]);
-  const [classes, setClasses] = useState<ClassData[]>([
-    {id: nanoid(), year: 1, class: ''},
-    {id: nanoid(), year: 1, class: ''},
-    {id: nanoid(), year: 1, class: ''},
+  setClasses([
+    { id: nanoid(), year: 1, class: '' },
+    { id: nanoid(), year: 1, class: '' },
+    { id: nanoid(), year: 1, class: '' },
   ]);
+};
 
   // button set to loading logic
   const [dots, setDots] = useState('.');
@@ -69,6 +83,8 @@ export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBui
 
   // form submit logic
 
+  const navigate = useNavigate();
+
   const onSubmit = async () => {
     setToast(null);
     setIsLoading(true);
@@ -81,19 +97,18 @@ export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBui
     }
 
     try {
-
-      const [timetables] = await Promise.all([
+      const [program] = await Promise.all([
         createProgram(teachers, classes),
         new Promise(resolve => setTimeout(resolve, 1000))
       ]);
 
-      if(!timetables.result || !timetables.data ){
+      if(!program.result || !program.data ){
         setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
         lastSubmittedRef.current = {teachers, classes};
         return;
       }
-      setTimeTables(timetables.data);
-      ifProgramCreated();
+      navigate('/program');
+      onProgramCreated(program.data);
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
       console.error(err);
@@ -130,6 +145,9 @@ export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBui
             <Info className={s.icon}/>
           </button>
         </Tooltip>
+
+        <button className={`${s.resetBtn} ${s}`} onClick={resetForm}>Sıfırla</button>
+
       </div>
       <div className={s.teacherSelector}>
         <ProfBranchForm teachers={teachers} setTeachers={setTeachers} />
@@ -151,6 +169,7 @@ export default function TableBuilder({ifProgramCreated, setTimeTables}: TableBui
         <Dices />
         </button>
       </Tooltip>
+
     </div>
 
     {toast && (
