@@ -9,9 +9,10 @@ import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
 import { createProgram } from "../utils/createProgram";
-import s from "../style/TableBuilder.module.css";
+import s from "../style/ProgramBuilder.module.css";
 import { useNavigate } from "react-router-dom";
 import type { TeacherData, ClassData, lessonSlot } from "../types";
+import Modal from "./Modal";
 
 type ProgramBuilderProps = {
   onProgramCreated: (data: lessonSlot[]) => void;
@@ -84,8 +85,19 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
   // form submit logic
 
   const navigate = useNavigate();
+  const [open, setOpen] = useState<boolean>(false);
 
+  const programCheck = () => {
+    const program = localStorage.getItem('program');
+    if(program){
+      setOpen(true);
+    }
+    else {
+      onSubmit();
+    }
+  }
   const onSubmit = async () => {
+
     setToast(null);
     setIsLoading(true);
 
@@ -159,7 +171,7 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
 
     <div className={s.btnContainer}>
       <button 
-      onClick={onSubmit} 
+      onClick={() => programCheck()} 
       className={s.btn}
       disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
       </button>
@@ -176,6 +188,14 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
       <Toast
         message={toast.message}
         onClose={() => {setToast(null);}}
+      />
+    )}
+
+    {open && (
+      <Modal
+        message="Sistemde kayıtlı bir program bulunmaktadır. Yenisini oluşturmak istediğinize emin misiniz?"
+        onConfirm={() => {setOpen(false); onSubmit(); }}
+        onCancel={() => setOpen(false)}
       />
     )}
     </>

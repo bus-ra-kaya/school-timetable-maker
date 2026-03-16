@@ -1,4 +1,4 @@
-import s from '../../style/TableBuilder.module.css';
+import s from '../../style/ProgramBuilder.module.css';
 import type {ClassData} from '../../types';
 import {Plus, Minus} from 'lucide-react';
 import { useEffect, useRef } from 'react';
