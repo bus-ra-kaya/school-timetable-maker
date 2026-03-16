@@ -51,6 +51,13 @@ model teacher {
   @@index([branch])
 }
 
+model classroom {
+  id          String @id @default(cuid())
+  name        String
+  grade       Grades
+  lessons     lesson[]
+}
+
 model lesson {
   id          String  @id @default(cuid())
   branch      Branches
@@ -67,11 +74,4 @@ model lesson {
   @@index([teacher_id])
   @@index([class_id])
   @@index([day, hour])
-}
-
-model classroom {
-  id          String @id @default(cuid())
-  name        String
-  grade       Grades
-  lessons     lesson[]
 }

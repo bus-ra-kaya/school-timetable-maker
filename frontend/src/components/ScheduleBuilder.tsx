@@ -8,17 +8,17 @@ import Tooltip from "./Tooltip";
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
-import { createProgram } from "../utils/createProgram";
-import s from "../style/ProgramBuilder.module.css";
+import { createSchedule } from "../utils/createSchedule";
+import s from "../style/ScheduleBuilder.module.css";
 import { useNavigate } from "react-router-dom";
-import type { TeacherData, ClassData, lessonSlot } from "../types";
+import type { TeacherData, ClassData, ClassroomSchedule } from "../types";
 import Modal from "./Modal";
 
-type ProgramBuilderProps = {
-  onProgramCreated: (data: lessonSlot[]) => void;
+type ScheduleBuilderProps = {
+  onScheduleCreated: (data: ClassroomSchedule[]) => void;
 }
 
-export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
+export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProps){
 
   // initialise teachers and classes, add the data to localStorage
 
@@ -87,9 +87,9 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
   const navigate = useNavigate();
   const [open, setOpen] = useState<boolean>(false);
 
-  const programCheck = () => {
-    const program = localStorage.getItem('program');
-    if(program){
+  const scheduleCheck = () => {
+    const schedule = localStorage.getItem('schedule');
+    if(schedule){
       setOpen(true);
     }
     else {
@@ -109,18 +109,18 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
     }
 
     try {
-      const [program] = await Promise.all([
-        createProgram(teachers, classes),
+      const [schedule] = await Promise.all([
+        createSchedule(teachers, classes),
         new Promise(resolve => setTimeout(resolve, 1000))
       ]);
 
-      if(!program.result || !program.data ){
+      if(!schedule.result || !schedule.data ){
         setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
         lastSubmittedRef.current = {teachers, classes};
         return;
       }
-      navigate('/program');
-      onProgramCreated(program.data);
+      navigate('/schedule');
+      onScheduleCreated(schedule.data);
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
       console.error(err);
@@ -171,7 +171,7 @@ export default function ProgramBuilder({onProgramCreated}: ProgramBuilderProps){
 
     <div className={s.btnContainer}>
       <button 
-      onClick={() => programCheck()} 
+      onClick={() => scheduleCheck()} 
       className={s.btn}
       disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
       </button>

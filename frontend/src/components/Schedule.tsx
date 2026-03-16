@@ -1,21 +1,29 @@
 import {ArrowLeftFromLine} from 'lucide-react';
-import type { lessonSlot } from '../types';
+import type { ClassroomSchedule } from '../types';
 import { useNavigate } from 'react-router-dom';
 const HOUR_COUNT = 8;
 const DAYS_COUNT = 5;
 
-type ProgramProps = {
-  program: lessonSlot[];
+type ScheduleProps = {
+  schedule: ClassroomSchedule[];
 }
 
-export default function Program({program}: ProgramProps){
+export default function Schedule({schedule}: ScheduleProps){
 
   const navigate = useNavigate();
 
+
+
   return(
-    <>
-    <div className='table-header'>
-      <ArrowLeftFromLine className="icon" onClick={() => navigate('/create-program')}/>
+    <div className='scheduleContainer'>
+      <div className='btnContainer'>
+         <ArrowLeftFromLine className="icon" onClick={() => navigate('/create-schedule')}/>
+      </div>
+    {schedule.map(clss => (
+      <>
+      <div className='table-header'>
+
+      <h1>{clss.classroom}</h1>
     </div>
       <div>
       <table>
@@ -36,7 +44,7 @@ export default function Program({program}: ProgramProps){
               {Array.from({length: DAYS_COUNT }).map((_, dayIndex) => {
 
                 const lessonIndex = (dayIndex * HOUR_COUNT) + hourIndex;
-                const lesson = program[lessonIndex];
+                const lesson = clss.lessons[lessonIndex];
 
                 return (
                   <td key={dayIndex}>
@@ -54,7 +62,8 @@ export default function Program({program}: ProgramProps){
         </tbody>
       </table>
     </div>
-    </>
+    </>))}
+    </div>
   )
 }
 

@@ -13,10 +13,15 @@
   flex-direction: column;
 }
 
-/* Timetable.tsx */
+/* Schedule.tsx */
+
+.scheduleContainer {
+  margin: 3rem 0;
+}
 table {
   padding: 1rem;
   border-collapse: collapse;
+  margin-bottom: 2rem;
 }
 
 td, th{
@@ -32,9 +37,15 @@ td, th{
 
 .table-header {
   display: flex;
+  justify-content: center;
+  font-size: 0.8rem;
 }
 
-.table-header .icon {
+.btnContainer {
+  display: flex;
+}
+
+.btnContainer .icon {
   margin: 0 1rem 1rem auto;
 }
 .icon {

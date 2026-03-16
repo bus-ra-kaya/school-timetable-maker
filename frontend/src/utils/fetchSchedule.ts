@@ -1,18 +1,18 @@
-import type { lessonSlot } from "../types";
+import type { ClassroomSchedule } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const NODE_MODE = import.meta.env.NODE_ENV;
 
 type ReturnValue = {
   result: boolean;
-  data: lessonSlot[] | null;
+  data: ClassroomSchedule[] | null;
   error: string | null;
 }
 
-export const fetchProgram = async (): Promise<ReturnValue> => {
+export const fetchSchedule = async (): Promise<ReturnValue> => {
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/program`, {
+    const response = await fetch(`${API_BASE_URL}/api/schedule`, {
     method: 'GET'
    });
 

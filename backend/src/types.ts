@@ -1,12 +1,13 @@
-export type LessonSlot = {
+export type lessonSlot = {
   name: string,
   branch: string,
 };
 
-export type ClassroomSchedule = {
-  classroom: string;
-  lessons: LessonSlot[];
-};
+export type Subject = {
+  name: string;
+  hours: number;
+  grade: 'elementary' | 'middle/high';
+}
 
 export type TeacherData = {
   id: string;

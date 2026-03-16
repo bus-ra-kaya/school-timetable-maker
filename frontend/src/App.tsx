@@ -1,15 +1,15 @@
 import './App.css';
-import ProgramBuilder from './components/ProgramBuilder';
-import Program from './components/Program';
+import ScheduleBuilder from './components/ScheduleBuilder';
+import Schedule from './components/Schedule';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 import {Routes, Route, Navigate} from 'react-router-dom';
-import { useProgram } from './hooks/useProgram';
+import { useSchedule } from './hooks/useSchedule';
 import { useState } from 'react';
-import type { lessonSlot } from './types';
+import type { ClassroomSchedule } from './types';
 
 function App() {
-  const {program, isLoading, error, clearError, saveProgram} = useProgram();
+  const {schedule, isLoading, error, clearError, saveSchedule} = useSchedule();
   const [toast, setToast] = useState<boolean>(false);
 
   if (isLoading) return <div>Yükleniyor...</div>;
@@ -20,23 +20,23 @@ function App() {
         <Routes>
           <Route
             path='/'
-            element={program.length > 0
-              ? <Navigate to='/program' />
-              : <Navigate to='/create-program' />
+            element={schedule.length > 0
+              ? <Navigate to='/schedule' />
+              : <Navigate to='/create-schedule' />
             }
           />
           <Route
-            path='/create-program'
+            path='/create-schedule'
             element={ 
-              <ProgramBuilder onProgramCreated={(program: lessonSlot[]) => {
-                saveProgram(program);
+              <ScheduleBuilder onScheduleCreated={(schedule: ClassroomSchedule[]) => {
+                saveSchedule(schedule);
                 setToast(true);
               }} />} > 
           </Route>
           <Route
-            path='/program'
+            path='/schedule'
             element={ 
-              <Program program={program} />
+              <Schedule schedule={schedule} />
             }>
           </Route>
           <Route path='*' element={<h1>404 - Page Not Found</h1>}></Route>
@@ -45,6 +45,7 @@ function App() {
       {toast && (
         <Toast
           message='Program başarıyla oluşturuldu.'
+          type='info'
           onClose={() => {setToast(false)}}
         />
       )}

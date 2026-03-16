@@ -1,4 +1,4 @@
-import s from '../../style/ProgramBuilder.module.css';
+import s from '../../style/ScheduleBuilder.module.css';
 import type { TeacherData } from '../../types';
 import { getRandomName } from '../../utils/getRandomName';
 import { Plus, Minus } from 'lucide-react';
