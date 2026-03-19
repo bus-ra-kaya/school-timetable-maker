@@ -1,11 +1,5 @@
 import { TeacherData} from "../types";
-import { gradeSpecificSubjects, multiGradeSubjects } from "../data/subjects";
-
-const ELEMENTARY_GRADES = [1,2,3,4];
-const MIDDLE_HIGH_GRADES = [5,6,7,8,9,10,11,12];
-const GRADE_COUNT = 12;
-const BRANCH_COUNT = 3;
-const MAX_HOURS_PER_TEACHER = 24;
+import { ELEMENTARY_GRADES, MIDDLE_HIGH_GRADES, GRADE_COUNT, BRANCH_COUNT, MAX_HOURS_PER_TEACHER, gradeSpecificSubjects, multiGradeSubjects  } from "../data/subjects";
 
 export const hasAllTeachers = (teachers: TeacherData[]) => {
 

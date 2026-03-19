@@ -21,13 +21,6 @@ const allSubjects: Subject[] =[
   { grade: 'middle/high', name: "Satranç", hours: 2 },
 ];
 
-const CAN_TEACH_ALL_GRADES = new Set([ "Resim","Müzik","Beden Eğitimi","Satranç"]);
-
-const seen = new Set<string>();
-export const multiGradeSubjects = allSubjects
-.filter(s => CAN_TEACH_ALL_GRADES.has(s.name) && !seen.has(s.name) && seen.add(s.name));
-export const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));
-
 export const branchMap: Record<string, Branches> = {
   'Türkçe':        Branches.TURKCE,
   'Matematik':     Branches.MATEMATIK,
@@ -39,3 +32,19 @@ export const branchMap: Record<string, Branches> = {
   'Fen Bilgisi':   Branches.FEN_BILGISI,
   'Satranç':       Branches.SATRANC,
 };
+
+
+const CAN_TEACH_ALL_GRADES = new Set([ "Resim","Müzik","Beden Eğitimi","Satranç"]);
+
+export const ELEMENTARY_GRADES = [1,2,3,4];
+export const MIDDLE_HIGH_GRADES = [5,6,7,8,9,10,11,12];
+
+export const GRADE_COUNT = 12;
+export const BRANCH_COUNT = 3;
+
+export const MAX_HOURS_PER_TEACHER = 24;
+
+const seen = new Set<string>();
+export const multiGradeSubjects = allSubjects
+.filter(s => CAN_TEACH_ALL_GRADES.has(s.name) && !seen.has(s.name) && seen.add(s.name));
+export const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));

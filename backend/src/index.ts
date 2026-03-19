@@ -24,10 +24,9 @@ app.get('/api/schedule', (req, res) => {
 
 app.post('/api/create-schedule', async (req, res) => {
 
+
   res.status(200).json({result: true, data: schedules, error: null});
 
-  /*
-  
   const {teachers, classes} = req.body;
 
   if (!isTeacherDataArray(teachers)) {
@@ -58,7 +57,7 @@ app.post('/api/create-schedule', async (req, res) => {
     console.log(err);
     res.status(500).json({ error: "Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz." });
   }
-*/
+
 });
 
 app.get("/health", (req, res) => {

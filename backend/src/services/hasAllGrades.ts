@@ -1,7 +1,5 @@
 import { ClassData } from "../types";
-
-const GRADE_COUNT = 12;
-const BRANCH_COUNT = 3;
+import { GRADE_COUNT, BRANCH_COUNT } from "../data/subjects";
 
 export const hasAllGrades = (classes: ClassData[]): boolean => {
 
