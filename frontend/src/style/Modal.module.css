@@ -46,6 +46,19 @@
   font-size: 1rem;
 }
 
+.primaryBtn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  background-color: rgb(22, 5, 5);
+  color: #f1efe8;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+
 .buttons button:last-child {
   background: #151618;
   color: white;
@@ -61,9 +74,8 @@
 
 .buttons button:first-child {
   background: #e4ceb6;
-  color: #151618;
+  color: #2c2c2a;
 }
-
 .buttons button:first-child:hover {
   background: #cebead;
 }

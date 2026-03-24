@@ -1,11 +1,34 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 400;
-  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.8rem;
+  padding-top: 0;
+  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.1);
 }
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.resetBtn {
+  margin-bottom: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: var(--secondary);
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  box-shadow: 0px 2px 6px rgb(0, 0, 0, 0.1); 
+}
+
 .info {
   background-color: transparent;
   border: none;
@@ -15,112 +38,98 @@
   width: 12px;
   height: 12px;
   margin-bottom: 0.5rem;
-  color: black;
+  color: var(--text);
 }
 
 .tableBuilder {
+  background: var(--card);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  max-width: 500px;
+  width: 100%;
+
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1rem;
+  margin: 2rem;
+
 }
 
 .btnContainer {
-  margin-top: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
   display: flex;
-  justify-content: center;
-  gap: 5px;
-  height: 45px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.btn {
-  padding: 0.6rem 1.2rem;
+.primaryBtn{
+  width: 100%;
+  padding: 0.5rem;
   font-size: 1rem;
-  background-color: rgb(22, 5, 5);
   border: none;
-  border-radius: 6px;
-  box-shadow: 0px 3px 10px rgb(0, 0, 0, 0.3);
+  border-radius: 10px;
+  font-weight: 500;
+  background-color: var(--primary);
+  color: #f1efe8;
   cursor: pointer;
-  transition: 0.3s ease;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 2.8rem;
+  box-shadow: 0px 2px 6px rgb(0, 0, 0, 0.1); 
 }
 
-.btn svg {
-  width: 24px;
-  height: 24px;
+.primaryBtn:hover {
+  background-color: var(--primary-hover);
 }
 
-.btn:disabled {
-  color: white;
+.primaryBtn:active {
+  background-color: var(--primary-active);
 }
 
-.btn:hover {
-  background-color: rgb(48, 11, 11);
-  box-shadow: 0px 5px 15px rgb(0, 0, 0, 0.4);
+
+.secondaryBtn {
+  height: 2.8rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-weight: 500;
+  background-color: var(--secondary);
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0px 2px 6px rgb(0, 0, 0, 0.1); 
 }
 
-.btn:active  {
-  background-color: rgb(77, 18, 18);
+.secondaryBtn:hover, .resetBtn:hover { 
+  background: var(--secondary-hover);
 }
 
-.resetBtn{
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
-  position: absolute;
-  left: calc(100% + 30px);
+.secondaryBtn:active, .resetBtn:active { 
+  background: var(--secondary--active);
 }
 
 .teacherSelector, .classSelector {
   padding: 0.4rem 0.8rem;
-  margin-bottom: 0.6rem;
   border-radius: 4px;
-  background-color: rgba(245, 227, 200, 0.74);
-  max-width: 500px;
-}
-
-.formContainer {
-  max-height: 30vh;
-  overflow-y: auto;
-}
-
-.fieldset {
-  border: none;
-  margin: 1rem;
-  padding: 0;
+  width: 100%;
   display: flex;
-  align-items: center;
-  font-size: 1rem;
-}
-
-.fieldset input, select, label {
-  border-radius: 4px;
-  border: none;
-}
-
-.fieldset select, input{
-  padding: 0.6rem 1.2rem;
-  margin: 0 0.2rem;
-  background-color: rgba(22, 5, 5, 0.952);
-  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
-}
-
-.fieldset label{
-  font-weight: 500;
-  margin-right: 0.2rem;
-}
-
-.fieldset input {
-  width: 100px;
-}
-
-.fieldset button {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 4px;
-  margin-left: 0.2rem;
-  box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.2);
+  align-items: center;
+  box-shadow: 0px 2px 6px rgb(0, 0, 0, 0.1); 
 }
 
 @media (max-width: 550px){
@@ -137,3 +146,5 @@
     flex-direction: column;
   }
 }
+
+

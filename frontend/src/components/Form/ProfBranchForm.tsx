@@ -1,4 +1,4 @@
-import s from '../../style/ScheduleBuilder.module.css';
+import s from '../../style/Form.module.css';
 import type { TeacherData } from '../../types';
 import { getRandomName } from '../../utils/getRandomName';
 import { Plus, Minus } from 'lucide-react';
@@ -60,7 +60,18 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {`${teachers.length} satır`}
       </div>
-
+      <div className={s.header}>
+        <span>Öğretmenler: </span>
+          <button
+            type='button'
+            onClick={addRow} 
+            className={s.btn}
+            aria-label='Yeni satır ekle'
+            ref={addButtonRef}>
+            <Plus aria-hidden='true'
+            />
+          </button>
+      </div>
       <div ref={containerRef} className={s.formContainer}>
         {teachers.map(row => (
           <fieldset key={row.id} className={s.fieldset}>
@@ -69,10 +80,11 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
               {row.branch && ` - ${row.branch}`}
             </legend>
 
-            <label htmlFor={`name-${row.id}`}>Öğretmen Adı:</label>
+            <label htmlFor={`name-${row.id}`} className='sr-only'>Öğretmen Adı:</label>
             <input
               type="text"
               id={`name-${row.id}`}
+              className={s.teacherInput}
               value={row.name}
               placeholder={row.placeholder}
               onChange={e => updateRow(row.id, 'name', e.target.value)}
@@ -89,16 +101,6 @@ export default function ProfBranchForm({ setTeachers, teachers }: ProfBranchForm
                 <option key={branch} value={branch}>{branch}</option>
               ))}
             </select>
-
-            <button
-              type="button"
-              onClick={addRow}
-              className={s.btn}
-              aria-label="Yeni satır ekle"
-              ref={addButtonRef}
-            >
-              <Plus aria-hidden="true" />
-            </button>
 
             <button
               type="button"

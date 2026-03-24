@@ -1,0 +1,69 @@
+
+.scheduleContainer {
+  width: 100%;
+}
+.table {
+  border: 1px solid black;
+  margin-bottom: 2rem;
+  border-collapse: collapse;
+}
+
+.td, .th {
+  text-align: start;
+  border: 1px solid black;
+  margin: 0;
+  padding: 0.3rem;
+  padding-left: 0.6rem;
+}
+
+tr {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tableProf {
+  font-weight: 600;
+}
+
+.tableLesson {
+  padding: 0.3rem 0.6rem;
+  background-color: rgb(205, 205, 250);
+  border-radius: 2px;
+  font-size: 0.8rem;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.title {
+  padding: 0 0.5rem;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: black;
+}
+
+.btnContainer {
+  display: flex;
+}
+
+.btnContainer .icon {
+  margin: 0 1rem 1rem auto;
+}
+
+.icon {
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.icon:hover{
+  color: rgb(48, 11, 11);
+}
+.icon:active{
+  color: rgb(77, 18, 18);
+}

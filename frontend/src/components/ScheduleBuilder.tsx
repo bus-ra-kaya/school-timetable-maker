@@ -149,39 +149,40 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
   return(
     <>
     <div className={s.tableBuilder}>
+      
       <div className={s.header}>
-        <h3>Ders Programı Hazırlama</h3>
+        <h3 className={s.title}>
+          Ders Programı Hazırlama
 
-        <Tooltip text="Öğretmen ve sınıf bilgilerini ekleyin, ardından Program Oluştur butonuna tıklayın. Çakışmalar otomatik olarak kontrol edilir.">
-          <button aria-label='Info' className={s.info}>
-            <Info className={s.icon}/>
-          </button>
-        </Tooltip>
-
-        <button className={`${s.resetBtn} ${s}`} onClick={resetForm}>Sıfırla</button>
-
+          <Tooltip text="Öğretmen ve sınıf bilgilerini ekleyin, ardından Program Oluştur butonuna tıklayın. Çakışmalar otomatik olarak kontrol edilir.">
+            <button aria-label='Info' className={s.info}>
+              <Info className={s.icon}/>
+            </button>
+          </Tooltip>
+        </h3>
+        <button className={s.resetBtn} onClick={resetForm}>Sıfırla</button>
       </div>
+
       <div className={s.teacherSelector}>
         <ProfBranchForm teachers={teachers} setTeachers={setTeachers} />
       </div>
       <div className={s.classSelector}>
         <ClassForm classes={classes} setClasses={setClasses} />
       </div>
-    </div>
 
-    <div className={s.btnContainer}>
+      <div className={s.btnContainer}>
       <button 
-      onClick={() => scheduleCheck()} 
-      className={s.btn}
+      onClick={() => scheduleCheck()}
+      className={s.primaryBtn}
       disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
       </button>
 
       <Tooltip text='Öğretmenleri ve sınıfları otomatik oluşturur.'>
-        <button className={s.btn} onClick={() => generateFormData()}>
-        <Dices />
+        <button className={s.secondaryBtn} onClick={() => generateFormData()}>
+        <Dices /> Rastgele doldur
         </button>
       </Tooltip>
-
+    </div>
     </div>
 
     {toast && (

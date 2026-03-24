@@ -11,53 +11,9 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-}
-
-/* Schedule.tsx */
-
-.scheduleContainer {
-  margin: 3rem 0;
-}
-table {
-  padding: 1rem;
-  border-collapse: collapse;
-  margin-bottom: 2rem;
-}
-
-td, th{
-  text-align: start;
-  border: 1px solid black;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-}
-
-.tableProf {
-  font-weight: 600;
-}
-
-.table-header {
-  display: flex;
-  justify-content: center;
-  font-size: 0.8rem;
-}
-
-.btnContainer {
-  display: flex;
-}
-
-.btnContainer .icon {
-  margin: 0 1rem 1rem auto;
-}
-.icon {
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.icon:hover{
-  color: rgb(48, 11, 11);
-}
-.icon:active{
-  color: rgb(77, 18, 18);
+  max-width: 600px;
+  width: 100%;
+  margin: 3rem;
 }
 
 /* Footer */
@@ -101,27 +57,6 @@ background-color: #3987c7;
   right: 0;
   height: 3px;
   transition: width 50ms linear;
-}
-
-/* Tooltip.tsx */
-
-.infoWrapper {
-  position: relative;
-}
-
-.tooltip {
-  position: absolute;
-  top: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  width: 120px;
-  background: rgb(22, 5, 5);
-  color: white;
-  border-radius: 4px;
-  box-shadow: 0px 5px 15px rgba(34, 33, 33, 0.3);
-  z-index: 10;
 }
 
 /* Misc */

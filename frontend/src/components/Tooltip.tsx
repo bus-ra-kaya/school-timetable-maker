@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import s from '../style/Tooltip.module.css';
 
 type TooltipProps = {
   text: string;
@@ -30,14 +31,22 @@ export default function Tooltip({text, children}: TooltipProps){
   const isVisible = open || isHovered;
 
   return (
-    <span className="infoWrapper" ref={tooltipRef}>
-      <span 
-      onClick={() => { isHovered ? setOpen(false) : setOpen(prev => !prev)}}
+    <span className={s.infoWrapper} ref={tooltipRef}>
+      <button 
+      onClick={() => {
+        if (isHovered) {
+          setOpen(false);
+        } else {
+          setOpen(prev => !prev);
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
+      onMouseLeave={() => setIsHovered(false)}
+      type='button'
+      className={s.trigger}>
         {children}
-      </span>
-      {isVisible && <span className="tooltip">{text}</span> }
+      </button>
+      {isVisible && <span className={s.tooltip}>{text}</span> }
     </span>
   )
 }

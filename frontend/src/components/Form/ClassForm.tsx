@@ -1,4 +1,4 @@
-import s from '../../style/ScheduleBuilder.module.css';
+import s from '../../style/Form.module.css';
 import type {ClassData} from '../../types';
 import {Plus, Minus} from 'lucide-react';
 import { useEffect, useRef } from 'react';
@@ -64,6 +64,19 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
            {`${classes.length} satır`}
       </div>
 
+      <div className={s.header}>
+        <span>Sınıflar: </span>
+         <button
+            type='button'
+            onClick={addRow} 
+            className={s.btn}
+            aria-label='Yeni satır ekle'
+            ref={addButtonRef}>
+            <Plus aria-hidden='true'
+            />
+          </button>
+      </div>
+
       <div ref={containerRef} className={s.formContainer}>
       {classes.map(row => (
 
@@ -72,7 +85,7 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
             {row.year} {row.class ? `- ${row.class}` : '. sınıf'}
           </legend>
 
-          <label htmlFor={`year-${row.id}`}>Sınıf: </label>
+          <label htmlFor={`year-${row.id}`} className='sr-only'>Sınıf: </label>
           <select
             id={`year-${row.id}`}
             value={row.year} 
@@ -86,20 +99,12 @@ export default function ClassForm({setClasses, classes}: ClassFormProps){
           <label htmlFor={`class-${row.id}`} className='sr-only'>Şube</label>
           <input type="text" 
             id={`class-${row.id}`}
+            className={s.classInput}
             value={row.class} 
             placeholder="A" 
             onChange={(e) => { updateRow(row.id, 'class', e.target.value);
           }} />
 
-          <button
-            type='button'
-            onClick={addRow} 
-            className={s.btn}
-            aria-label='Yeni satır ekle'
-            ref={addButtonRef}>
-            <Plus aria-hidden='true'
-            />
-          </button>
           <button 
             type='button'
             onClick={() => removeRow(row.id)} 
