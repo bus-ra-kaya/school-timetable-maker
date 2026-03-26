@@ -45,14 +45,31 @@ app.post('/api/create-schedule', async (req, res) => {
   }
 
   try {
-    await prisma.$transaction([
-      prisma.classroom.createMany({ data: classes.map(mapClasses) }),
-      prisma.teacher.createMany({ data: teachers.map(mapTeachers) }),
-    ]);
+    const result = await prisma.$transaction(async (tx) => {
+      const schedule = await tx.schedule.create({
+        data: {}
+      })
+
+
+    const scheduleId = schedule.id;
+
+    await tx.classroom.createMany({
+      data: classes.map(c => ({
+        ...mapClasses(c),
+        scheduleId,
+      }))
+    });
+
+    await tx.teacher.createMany({
+      data: teachers.map(t => ({
+        ...mapTeachers(t),
+        scheduleId,
+      }))
+    })
 
 
 
-
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz." });
@@ -71,6 +88,16 @@ app.listen(PORT, () => {
 const schedules = [
   {
     classroom: "1-A",
+    teachers: [
+      { name: "Ali", branch: "TURKCE", totalClasses: 5 },
+      { name: "Ayşe", branch: "MATEMATIK", totalClasses: 5 },
+      { name: "John", branch: "INGILIZCE", totalClasses: 5 },
+      { name: "Kemal", branch: "BEDEN_EGITIMI", totalClasses: 5 },
+      { name: "Elif", branch: "RESIM", totalClasses: 5 },
+      { name: "Mert", branch: "MUZIK", totalClasses: 5 },
+      { name: "Zeynep", branch: "HAYAT_BILGISI", totalClasses: 5 },
+      { name: "Ahmet", branch: "FEN_BILGISI", totalClasses: 5 },
+    ],
     lessons: [
       { name: "Ali", branch: "TURKCE" },
       { name: "Ayşe", branch: "MATEMATIK" },
@@ -120,6 +147,16 @@ const schedules = [
   },
   {
     classroom: "2-B",
+    teachers: [
+      { name: "Fatma", branch: "TURKCE", totalClasses: 5 },
+      { name: "Mehmet", branch: "MATEMATIK", totalClasses: 5 },
+      { name: "Sarah", branch: "INGILIZCE", totalClasses: 5 },
+      { name: "Burak", branch: "BEDEN_EGITIMI", totalClasses: 5 },
+      { name: "Deniz", branch: "RESIM", totalClasses: 5 },
+      { name: "Cem", branch: "MUZIK", totalClasses: 5 },
+      { name: "Selin", branch: "FEN_BILGISI", totalClasses: 5 },
+      { name: "Kerem", branch: "SATRANC", totalClasses: 5 }
+    ],
     lessons: [
       { name: "Fatma", branch: "TURKCE" },
       { name: "Mehmet", branch: "MATEMATIK" },

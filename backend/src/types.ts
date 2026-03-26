@@ -1,4 +1,4 @@
-import { Grades, Branches } from "../generated/prisma/enums";
+import { Grades} from "../generated/prisma/enums";
 
 export type lessonSlot = {
   name: string,
@@ -31,11 +31,4 @@ export type TeacherWithLoad = {
   hours: number;
   grade: Grades | null;
   assignedHours: number;
-}
-
-export type ClassroomWithLoad = {
-  id: string;
-  name: string;
-  grade: Grades;
-  branchCounts: Partial<Record<Branches, number>>;
 }

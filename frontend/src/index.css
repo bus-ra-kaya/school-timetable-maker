@@ -11,18 +11,20 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --bg: #F0F9FF;
-  --card: #FFFFFF;
-  --primary: #0284C7;
-  --primary-hover: #0369A1;
-  --primary-active: #075985;
-  --secondary: rgb(230, 240, 247);
-  --secondary-hover: rgb(186, 230, 253);
-  --secondary-active: rgb(125, 211, 252);
-  --input-bg: #ebf2f8;
-  --border: #c3c7c9;
-  --text: #0F172A;
-
+ --bg: #FFF7ED;
+--card: #FFFFFF;
+--primary: #F97316;
+--primary-hover: #EA580C;
+--primary-active: #C2410C;
+--secondary: rgb(255, 237, 213);
+--secondary-hover: rgb(254, 215, 170);
+--secondary-active: rgb(253, 186, 116);
+--input-bg: #FFFBF5;
+--border: #F5D7C6;
+--table-border:#c2aa9d;
+--text: #3B1F10;
+--error: #f56a1f;
+--info: #f8b28c;
 }
 
 body {

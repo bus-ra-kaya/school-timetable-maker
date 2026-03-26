@@ -1,7 +1,7 @@
 import type { Subject } from "../types";
 import { Branches } from "../../generated/prisma/enums";
 
-const allSubjects: Subject[] =[
+export const allSubjects: Subject[] =[
   { grade: 'elementary', name: "Türkçe", hours: 10 },
   { grade: 'elementary', name: "Matematik", hours: 10 },
   { grade: 'elementary', name: "İngilizce", hours: 8 },

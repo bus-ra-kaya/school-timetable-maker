@@ -7,7 +7,7 @@ type ToastProps = {
   onClose: () => void;
 }
 
-export default function Toast({message, type = 'error', duration = 4000, onClose}: ToastProps){
+export default function Toast({message, type = 'error', duration = 3000, onClose}: ToastProps){
 
   const [progress, setProgress] = useState(100);
 

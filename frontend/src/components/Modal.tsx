@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import { CircleAlert } from 'lucide-react';
 
 type ModalProps = {
-  message: string;
+  children: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export default function Modal({message, confirmText = 'Evet', cancelText= 'Hayır', onConfirm, onCancel }:ModalProps ){
+export default function Modal({children, confirmText = 'Evet', cancelText= 'Hayır', onConfirm, onCancel }:ModalProps ){
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -31,7 +31,7 @@ export default function Modal({message, confirmText = 'Evet', cancelText= 'Hayı
     <div className={s.overlay} onClick={onCancel}>
       <div className={s.modal} onClick={e => e.stopPropagation()}>
         <CircleAlert />
-        <p>{message}</p>
+        <div>{children}</div>
         <div className={s.buttons}>
           <button onClick={onConfirm}>{confirmText}</button>
           <button onClick={onCancel}>{cancelText}</button>

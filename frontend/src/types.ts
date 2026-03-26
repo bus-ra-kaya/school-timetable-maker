@@ -5,6 +5,11 @@ export type LessonSlot = {
 
 export type ClassroomSchedule = {
   classroom: string;
+  teachers: 
+     {name: string;
+      branch: string;
+      totalClasses: number;
+    }[];
   lessons: LessonSlot[];
 };
 

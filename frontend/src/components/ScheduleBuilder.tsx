@@ -193,11 +193,9 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
     )}
 
     {open && (
-      <Modal
-        message="Sistemde kayıtlı bir program bulunmaktadır. Yenisini oluşturmak istediğinize emin misiniz?"
-        onConfirm={() => {setOpen(false); onSubmit(); }}
-        onCancel={() => setOpen(false)}
-      />
+      <Modal onConfirm={() => {setOpen(false); onSubmit(); }} onCancel={() => setOpen(false)}>
+        <p>Sistemde kayıtlı bir program bulunmaktadır. Yenisini oluşturmak istediğinize emin misiniz?</p>
+      </Modal>
     )}
     </>
   )

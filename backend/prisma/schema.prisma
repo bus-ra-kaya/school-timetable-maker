@@ -40,6 +40,15 @@ enum Days {
 
 // debate adding contstraint to the hours teacher hours
 
+model schedule {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  
+  teachers    teacher[]
+  classrooms  classroom[]
+  lessons     lesson[]
+}
+
 model teacher {
   id          String  @id @default(cuid())
   name        String
@@ -48,6 +57,9 @@ model teacher {
   grade       Grades?
   lessons     lesson[]
 
+  scheduleId  String
+  schedule    schedule  @relation(fields: [scheduleId], references: [id])
+
   @@index([branch])
 }
 
@@ -55,6 +67,9 @@ model classroom {
   id          String @id @default(cuid())
   name        String
   grade       Grades
+
+  scheduleId  String
+  schedule    schedule  @relation(fields: [scheduleId], references: [id])
   lessons     lesson[]
 }
 
@@ -65,13 +80,17 @@ model lesson {
   class_id    String
   hour        Int
   day         Days
+  scheduleId  String
+
+  schedule    schedule  @relation(fields: [scheduleId], references: [id])
   teacher     teacher @relation(fields: [teacher_id], references: [id])
   classroom   classroom @relation(fields: [class_id], references: [id])
 
-  @@unique([teacher_id,day,hour])
-  @@unique([class_id, day, hour])
+  @@unique([scheduleId, teacher_id, day, hour])
+  @@unique([scheduleId, class_id, day, hour])
 
   @@index([teacher_id])
   @@index([class_id])
   @@index([day, hour])
+  @@index([scheduleId])
 }
