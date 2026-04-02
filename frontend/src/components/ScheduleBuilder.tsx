@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Info, Dices } from "lucide-react";
 import { nanoid } from "nanoid";
 import ProfBranchForm from "./Form/ProfBranchForm";
 import ClassForm from "./Form/ClassForm";
 import Toast from "./Toast";
 import Tooltip from "./Tooltip";
+import Modal from "./Modal";
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
 import { createSchedule } from "../utils/createSchedule";
-import s from "../style/ScheduleBuilder.module.css";
-import { useNavigate } from "react-router-dom";
 import type { TeacherData, ClassData, ClassroomSchedule } from "../types";
-import Modal from "./Modal";
+import s from "../style/ScheduleBuilder.module.css";
 
 type ScheduleBuilderProps = {
   onScheduleCreated: (data: ClassroomSchedule[]) => void;
@@ -146,20 +146,35 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
     setClasses(classes);
   }
 
+  //refocus the trigger button when the modal closes
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const handleCancel = () => {
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const handleConfirm = () => {
+    setOpen(false);
+    triggerRef.current?.focus();
+    onSubmit();
+  }
+
   return(
     <>
     <div className={s.tableBuilder}>
       
       <div className={s.header}>
-        <h3 className={s.title}>
+        <div className={s.titleContainer}>
+          <h1 className={s.title}>
           Ders Programı Hazırlama
-
+          </h1>
           <Tooltip text="Öğretmen ve sınıf bilgilerini ekleyin, ardından Program Oluştur butonuna tıklayın. Çakışmalar otomatik olarak kontrol edilir.">
-            <button aria-label='Info' className={s.info}>
-              <Info className={s.icon}/>
+            <button aria-label='Bilgi' className={s.info}>
+              <Info className={s.icon} aria-hidden='true' />
             </button>
-          </Tooltip>
-        </h3>
+        </Tooltip>
+        </div>
         <button className={s.resetBtn} onClick={resetForm}>Sıfırla</button>
       </div>
 
@@ -172,28 +187,37 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
 
       <div className={s.btnContainer}>
       <button 
-      onClick={() => scheduleCheck()}
-      className={s.primaryBtn}
-      disabled={isLoading || !isFormChanged}> {isLoading ? dots : 'Program Oluştur'}
+        ref={triggerRef}
+        onClick={() => {
+          if (!isLoading && isFormChanged) scheduleCheck();
+        }}
+        className={s.primaryBtn}
+        aria-disabled={isLoading || !isFormChanged}
+        aria-busy={isLoading}
+      > 
+        <span aria-hidden='true'>{isLoading ? dots : 'Program Oluştur'}</span>
+        <span className="sr-only">{isLoading ? 'Yükleniyor' : 'Program Oluştur'}</span>
       </button>
 
       <Tooltip text='Öğretmenleri ve sınıfları otomatik oluşturur.'>
         <button className={s.secondaryBtn} onClick={() => generateFormData()}>
-        <Dices /> Rastgele doldur
+        <Dices aria-hidden='true' /> Rastgele doldur
         </button>
       </Tooltip>
     </div>
     </div>
 
-    {toast && (
+    <div aria-live='polite' aria-atomic='true'>
+      {toast && (
       <Toast
         message={toast.message}
         onClose={() => {setToast(null);}}
       />
     )}
+    </div>
 
     {open && (
-      <Modal onConfirm={() => {setOpen(false); onSubmit(); }} onCancel={() => setOpen(false)}>
+      <Modal onConfirm={handleConfirm} onCancel={handleCancel}>
         <p>Sistemde kayıtlı bir program bulunmaktadır. Yenisini oluşturmak istediğinize emin misiniz?</p>
       </Modal>
     )}

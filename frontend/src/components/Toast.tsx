@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import s from '../style/Toast.module.css';
 
 type ToastProps = {
   message: string;
@@ -20,9 +21,10 @@ export default function Toast({message, type = 'error', duration = 3000, onClose
           clearInterval(timer);
           return 0;
         }
-        return prev - step;
+        return prev - step <= 0 ? 0 : prev - step;
       })
     }, interval);
+
 
     return () => clearInterval(timer);
 
@@ -35,9 +37,25 @@ export default function Toast({message, type = 'error', duration = 3000, onClose
   }, [progress, onClose]);
 
   return (
-    <div className={`toastContainer ${type}`}>
+    <div
+      role={type == 'error' ? 'alert' : 'status'}
+      aria-atomic='true'
+      className={`${s.toastContainer} ${type === 'error' ? s.error : s.info}`}
+    >
+      <button
+        onClick={onClose}
+        aria-label='Bildirimi kapat'
+        type='button'
+        className={s.exitBtn}
+      >
+        X
+      </button>
       {message}
-      <div className={`toastLine`} style={{width: `${progress}%`}}></div>
+      <div 
+        aria-hidden='true' 
+        className={s.toastLine} 
+        style={{width: `${progress}%`}}
+      ></div>
     </div>
   )
 }

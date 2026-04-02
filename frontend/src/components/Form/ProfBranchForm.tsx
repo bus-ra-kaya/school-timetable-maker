@@ -1,9 +1,9 @@
-import s from '../../style/Form.module.css';
-import type { TeacherData } from '../../types';
-import { getRandomName } from '../../utils/getRandomName';
-import { Plus, Minus } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { Minus, Plus } from 'lucide-react';
 import { nanoid } from 'nanoid';
+import { getRandomName } from '../../utils/getRandomName';
+import type { TeacherData } from '../../types';
+import s from '../../style/Form.module.css';
 
 type ProfBranchFormProps = {
   teachers: TeacherData[];

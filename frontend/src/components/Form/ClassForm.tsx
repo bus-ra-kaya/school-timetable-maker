@@ -1,8 +1,8 @@
-import s from '../../style/Form.module.css';
-import type {ClassData} from '../../types';
-import {Plus, Minus} from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { nanoid} from 'nanoid';
+import { Minus, Plus } from 'lucide-react';
+import { nanoid } from 'nanoid';
+import type { ClassData } from '../../types';
+import s from '../../style/Form.module.css';
 
 type ClassFormProps = {
   classes: ClassData[];

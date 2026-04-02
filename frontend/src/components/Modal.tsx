@@ -1,6 +1,7 @@
-import s from '../style/Modal.module.css';
-import { useEffect } from 'react';
+import { useId, useRef, useEffect } from 'react';
+import { FocusTrap } from 'focus-trap-react';
 import { CircleAlert } from 'lucide-react';
+import s from '../style/Modal.module.css';
 
 type ModalProps = {
   children: React.ReactNode;
@@ -12,31 +13,50 @@ type ModalProps = {
 
 export default function Modal({children, confirmText = 'Evet', cancelText= 'Hayır', onConfirm, onCancel }:ModalProps ){
 
+  const descId = useId();
+  const titleId = useId();
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if(e.key === 'Escape') {
+    modalRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         onCancel();
-      };
+      }
     };
-
-    document.addEventListener('keydown', handleEscape);
-
-    return(() => {
-      document.addEventListener('keydown', handleEscape);
-    })
-
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
   }, [onCancel]);
 
   return (
-    <div className={s.overlay} onClick={onCancel}>
-      <div className={s.modal} onClick={e => e.stopPropagation()}>
-        <CircleAlert />
-        <div>{children}</div>
-        <div className={s.buttons}>
-          <button onClick={onConfirm}>{confirmText}</button>
-          <button onClick={onCancel}>{cancelText}</button>
+    <FocusTrap>
+      <div className={s.overlay} onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onCancel();
+        }
+      }}>
+        <div
+          ref={modalRef}
+          className={s.modal}
+          role='dialog'
+          aria-modal='true'
+          tabIndex={-1}
+          aria-describedby={descId}
+          aria-labelledby ={titleId}
+        >
+          <CircleAlert aria-hidden='true' />
+          <h2 id={titleId} className='sr-only'>Onay gerektiriyor</h2>
+          <div id={descId}>{children}</div>
+          <div className={s.buttons}>
+            <button type='button' onClick={onConfirm}>{confirmText}</button>
+            <button type='button' onClick={onCancel}>{cancelText}</button>
+          </div>
         </div>
       </div>
-    </div>
+    </FocusTrap> 
   )
 }

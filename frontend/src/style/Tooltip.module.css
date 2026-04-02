@@ -25,3 +25,7 @@
   all: unset;
   width: 100%;
 }
+
+.hidden {
+  display: none;
+}

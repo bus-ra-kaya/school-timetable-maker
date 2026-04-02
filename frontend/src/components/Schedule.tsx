@@ -1,10 +1,11 @@
-import {ArrowLeftFromLine, FileDown} from 'lucide-react';
-import type { ClassroomSchedule } from '../types';
-import {exportSchedule} from '../services/exportSchedule';
-import { useNavigate } from 'react-router-dom';
-import s from '../style/Schedule.module.css';
-import Modal from './Modal';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeftFromLine, FileDown } from 'lucide-react';
+import Modal from './Modal';
+import { exportSchedule } from '../services/exportSchedule';
+import type { ClassroomSchedule } from '../types';
+import s from '../style/Schedule.module.css';
+
 
 const HOUR_COUNT = 8;
 const DAYS_COUNT = 5;
@@ -26,10 +27,11 @@ export default function Schedule({schedule}: ScheduleProps){
   return(
    <div className={s.scheduleContainer}>
     <div className={s.leaveBtnContainer}>
-      <ArrowLeftFromLine
-        className={s.icon}
+      <button className={s.btn} 
         onClick={() => navigate('/create-schedule')}
-      />
+        aria-label='Geri dön'>
+        <ArrowLeftFromLine className={s.icon} aria-hidden='true' />
+      </button>
     </div>
 
     {schedule.map((clss) => (
@@ -38,30 +40,34 @@ export default function Schedule({schedule}: ScheduleProps){
         <h1 className={s.title}>{clss.classroom}</h1>
         <span className={s.line}></span>
         <div className={s.btnContainer}>
-          <button className={s.btn}>
-            <FileDown onClick={() => 
-              {setOpen(true); setExportMode('single'); setSelectedClass(clss.classroom);}} className={s.icon}/>
+          <button className={s.btn}
+            aria-label='Programı dışarı aktar'
+            onClick={() => 
+              {setOpen(true); setExportMode('single'); setSelectedClass(clss.classroom);}}>
+            <FileDown
+              className={s.icon}
+              aria-hidden='true'/>
           </button>
         </div>
       </div>
       <div>
         <div className={s.tableWrap}>
-          <table className={s.table}>
+          <table className={s.table} aria-label={`${clss.classroom} ders programı`}>
             <thead>
               <tr className={s.tr}>
-                <th className={s.th}>Saat</th>
-                <th className={s.th}>Pazartesi</th>
-                <th className={s.th}>Salı</th>
-                <th className={s.th}>Çarşamba</th>
-                <th className={s.th}>Perşembe</th>
-                <th className={s.th}>Cuma</th>
+                <th className={s.th} scope='col'>Saat</th>
+                <th className={s.th} scope='col'>Pazartesi</th>
+                <th className={s.th} scope='col'>Salı</th>
+                <th className={s.th} scope='col'>Çarşamba</th>
+                <th className={s.th} scope='col'>Perşembe</th>
+                <th className={s.th} scope='col'>Cuma</th>
               </tr>
             </thead>
 
             <tbody>
               {Array.from({ length: HOUR_COUNT }).map((_, hourIndex) => (
                 <tr key={hourIndex} className={s.tr}>
-                  <th className={s.th}>{hourIndex + 1}</th>
+                  <th className={s.th} scope='row'>{hourIndex + 1}</th>
 
                   {Array.from({ length: DAYS_COUNT }).map((_, dayIndex) => {
                     const lessonIndex =
@@ -69,7 +75,7 @@ export default function Schedule({schedule}: ScheduleProps){
                     const lesson = clss.lessons[lessonIndex];
 
                     return (
-                      <td key={dayIndex} className={s.td}>
+                      <td key={dayIndex} className={s.td} aria-label={lesson ? undefined : 'Boş'}>
                         {lesson ? (
                           <>
                             <div className={s.tableProf}>
@@ -87,12 +93,12 @@ export default function Schedule({schedule}: ScheduleProps){
           </table>
         </div>
         <div className={s.tableWrap}>
-          <table className={s.table}>
+          <table className={s.table} aria-label={`${clss.classroom} öğretmen listesi`}>
           <thead>
             <tr className={s.tr}>
-              <th className={s.th}>Dersin Adı</th>
-              <th className={s.th}>Öğretmen</th>
-              <th className={s.th}>H.D.S</th>
+              <th className={s.th} scope='col'>Dersin Adı</th>
+              <th className={s.th} scope='col'>Öğretmen</th>
+              <th className={s.th} scope='col' title='Haftalık ders saati'>H.D.S</th>
             </tr>
           </thead>
 
@@ -131,7 +137,7 @@ export default function Schedule({schedule}: ScheduleProps){
           <div className={s.options}>
 
             <label className={s.label}>
-              <input type="radio" checked={exportMode === 'single'} onChange={() => setExportMode('single')}/> 
+              <input type="radio" name='exportMode' checked={exportMode === 'single'} onChange={() => setExportMode('single')}/> 
               <div className={s.radioCircle}>
                 <div className={s.radioDot}>
                 </div>
@@ -139,7 +145,7 @@ export default function Schedule({schedule}: ScheduleProps){
             </label>
 
             <label className={s.label}>
-              <input type="radio" checked={exportMode === 'all'} onChange={() => setExportMode('all')}/>
+              <input type="radio" name='exportMode' checked={exportMode === 'all'} onChange={() => setExportMode('all')}/>
               <div className={s.radioCircle}>
                 <div className={s.radioDot}>
                 </div>
@@ -154,4 +160,5 @@ export default function Schedule({schedule}: ScheduleProps){
   )
 }
 
+//might need to make sure focus gets returned to the right place once the modal closes
 // might need to go over how the day/hour indexing works

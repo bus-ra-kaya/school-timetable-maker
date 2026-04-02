@@ -8,7 +8,6 @@
   border: 1px solid var(--border);
   border-radius: 5px;
   padding: 1rem;
-  margin: 2rem;
 }
 
 .header {
@@ -19,6 +18,11 @@
   padding: 0.8rem;
   padding-top: 0;
   box-shadow: 0px 2px 4px rgb(0, 0, 0, 0.1);
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
 }
 
 .title {
@@ -88,6 +92,11 @@
 
 .primaryBtn:active {
   background-color: var(--primary-active);
+}
+
+.primaryBtn[aria-disabled='true']{
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 

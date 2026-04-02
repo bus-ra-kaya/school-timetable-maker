@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useId } from "react";
 import s from '../style/Tooltip.module.css';
 
 type TooltipProps = {
@@ -12,6 +12,7 @@ export default function Tooltip({text, children}: TooltipProps){
   const [isHovered, setIsHovered] = useState(false);
   const tooltipRef = useRef<HTMLSpanElement>(null);
 
+  // handling clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if(tooltipRef.current &&
@@ -19,20 +20,28 @@ export default function Tooltip({text, children}: TooltipProps){
           setOpen(false);
       }
     };
+   
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if(e.key === 'Escape') setOpen(false);
+    }
     if(open) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
-    return () =>
+    return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-
+      document.removeEventListener('keydown', handleKeyDown);
+    }
   }, [open]);
 
   const isVisible = open || isHovered;
+  const tooltipId = useId();
 
   return (
     <span className={s.infoWrapper} ref={tooltipRef}>
-      <button 
+      <button
+      aria-label='Daha fazla bilgi'
       onClick={() => {
         if (isHovered) {
           setOpen(false);
@@ -46,7 +55,14 @@ export default function Tooltip({text, children}: TooltipProps){
       className={s.trigger}>
         {children}
       </button>
-      {isVisible && <span className={s.tooltip}>{text}</span> }
+      <span
+        role='tooltip'
+        id={tooltipId}
+        aria-hidden={!isVisible}
+        className={`${s.tooltip} ${isVisible ? s.visible : s.hidden}`}
+      >
+        {text}
+      </span>
     </span>
   )
 }

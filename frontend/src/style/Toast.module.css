@@ -1,0 +1,44 @@
+.error {
+  background-color: var(--error);
+}
+
+.info {
+background-color: var(--info);
+}
+
+.toastContainer {
+  min-height: 2rem;
+  color: var(--text);
+  padding: 1rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  margin: 1rem 2rem;
+  width: 250px;
+  position: fixed;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+
+.toastLine {
+  position: absolute;
+  background-color: white;
+  bottom: 0;
+  right: 0;
+  height: 5px;
+  transition: width 50ms linear;
+}
+
+.exitBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  border: 1px solid white;
+  border-radius: 4px;
+  background-color: transparent;
+  color: white;
+  z-index: 100;
+  cursor: pointer;
+}
