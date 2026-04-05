@@ -9,6 +9,7 @@ export type Subject = {
   name: string;
   hours: number;
   grade: 'elementary' | 'middle/high';
+  doubleDaily: boolean;
 }
 
 export type TeacherData = {

@@ -7,6 +7,7 @@ import { isTeacherDataArray, isClassDataArray } from './services/verifyDataShape
 import cors from 'cors';
 import { prisma } from './prisma';
 import { mapTeachers } from './services/mapTeachers';
+import { lessonScheduler } from './services/scheduling/lessonScheduler';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -23,7 +24,6 @@ app.get('/api/schedule', (req, res) => {
 });
 
 app.post('/api/create-schedule', async (req, res) => {
-
 
   res.status(200).json({result: true, data: schedules, error: null});
 
@@ -45,34 +45,37 @@ app.post('/api/create-schedule', async (req, res) => {
   }
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
-      const schedule = await tx.schedule.create({
-        data: {}
-      })
+    const schedule = await prisma.$transaction(async (tx) => {
+      const schedule = await tx.schedule.create({ data: {} });
 
+      await tx.classroom.createMany({
+        data: classes.map(c => ({ ...mapClasses(c), scheduleId: schedule.id }))
+      });
 
-    const scheduleId = schedule.id;
+      await tx.teacher.createMany({
+        data: teachers.map(t => ({ ...mapTeachers(t), scheduleId: schedule.id }))
+      });
 
-    await tx.classroom.createMany({
-      data: classes.map(c => ({
-        ...mapClasses(c),
-        scheduleId,
-      }))
+      return schedule;
     });
 
-    await tx.teacher.createMany({
-      data: teachers.map(t => ({
-        ...mapTeachers(t),
-        scheduleId,
-      }))
-    })
+    const {result} = await lessonScheduler(schedule.id);
 
+    if (!result) {
+      await prisma.lesson.deleteMany({ where: { scheduleId: schedule.id } });
+      await prisma.teacher.deleteMany({ where: { scheduleId: schedule.id } });
+      await prisma.classroom.deleteMany({ where: { scheduleId: schedule.id } });
 
+      await prisma.schedule.delete({ where: { id: schedule.id } });
+      return res.status(500).json({result: false, error: 'Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz.' });
+    }
 
-    });
+    console.log(result);
+    return res.status(200).json({result: true, data: schedules, error: null });
+
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz." });
+    res.status(500).json({ result: false, error: "Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz." });
   }
 
 });
