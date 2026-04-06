@@ -1,8 +1,13 @@
-import { Grades} from "../generated/prisma/enums";
+import { Days, Grades} from "../generated/prisma/enums";
 
 export type lessonSlot = {
-  name: string,
-  branch: string,
+  name: string;
+  branch: string;
+};
+
+export type DateSlot = {
+  day: Days;
+  hour: number;
 };
 
 export type Subject = {
@@ -10,7 +15,7 @@ export type Subject = {
   hours: number;
   grade: 'elementary' | 'middle/high';
   doubleDaily: boolean;
-}
+};
 
 export type TeacherData = {
   id: string;
@@ -32,4 +37,10 @@ export type TeacherWithLoad = {
   hours: number;
   grade: Grades | null;
   assignedHours: number;
+}
+
+export type Classroom = {
+  id: string,
+  name: string,
+  grade: Grades
 }

@@ -7,7 +7,7 @@ import { isTeacherDataArray, isClassDataArray } from './services/verifyDataShape
 import cors from 'cors';
 import { prisma } from './prisma';
 import { mapTeachers } from './services/mapTeachers';
-import { lessonScheduler } from './services/scheduling/lessonScheduler';
+import { buildSchedule } from './services/scheduling/buildSchedule';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -20,12 +20,10 @@ app.use(cors({
 app.use(express.json());
 
 app.get('/api/schedule', (req, res) => {
-  res.status(200).json({result: true, data: schedules, error: null});
+  res.status(200).json({result: true, data: null, error: null});
 });
 
 app.post('/api/create-schedule', async (req, res) => {
-
-  res.status(200).json({result: true, data: schedules, error: null});
 
   const {teachers, classes} = req.body;
 
@@ -59,7 +57,7 @@ app.post('/api/create-schedule', async (req, res) => {
       return schedule;
     });
 
-    const {result} = await lessonScheduler(schedule.id);
+    const {result} = await buildSchedule(schedule.id);
 
     if (!result) {
       await prisma.lesson.deleteMany({ where: { scheduleId: schedule.id } });
@@ -71,7 +69,7 @@ app.post('/api/create-schedule', async (req, res) => {
     }
 
     console.log(result);
-    return res.status(200).json({result: true, data: schedules, error: null });
+    return res.status(200).json({result: true, data: null, error: null });
 
   } catch (err) {
     console.log(err);
@@ -88,51 +86,7 @@ app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
 
-const schedules = [
-  {
-    classroom: "1-A",
-    teachers: [
-      { name: "Ali Yılmaz", branch: "Türkçe", totalClasses: 5 },
-      { name: "Ayşe Demir", branch: "Matematik", totalClasses: 5 },
-      { name: "Emre Kaya", branch: "İngilizce", totalClasses: 5 },
-      { name: "Kemal Arslan", branch: "Beden Eğitimi", totalClasses: 5 },
-      { name: "Elif Şahin", branch: "Resim", totalClasses: 5 },
-      { name: "Mert Çelik", branch: "Müzik", totalClasses: 5 },
-      { name: "Zeynep Koç", branch: "Hayat Bilgisi", totalClasses: 5 },
-      { name: "Ahmet Aksoy", branch: "Fen Bilgisi", totalClasses: 5 },
-    ],
-    lessons: Array(5).fill([
-      { name: "Ali Yılmaz", branch: "Türkçe" },
-      { name: "Ayşe Demir", branch: "Matematik" },
-      { name: "Emre Kaya", branch: "İngilizce" },
-      { name: "Kemal Arslan", branch: "Beden Eğitimi" },
-      { name: "Elif Şahin", branch: "Resim" },
-      { name: "Mert Çelik", branch: "Müzik" },
-      { name: "Zeynep Koç", branch: "Hayat Bilgisi" },
-      { name: "Ahmet Aksoy", branch: "Fen Bilgisi" }
-    ]).flat()
-  },
-  {
-    classroom: "2-B",
-    teachers: [
-      { name: "Fatma Öztürk", branch: "Türkçe", totalClasses: 5 },
-      { name: "Mehmet Kılıç", branch: "Matematik", totalClasses: 5 },
-      { name: "Seda Arı", branch: "İngilizce", totalClasses: 5 },
-      { name: "Burak Yıldız", branch: "Beden Eğitimi", totalClasses: 5 },
-      { name: "Deniz Polat", branch: "Resim", totalClasses: 5 },
-      { name: "Cem Tuncer", branch: "Müzik", totalClasses: 5 },
-      { name: "Selin Uysal", branch: "Fen Bilgisi", totalClasses: 5 },
-      { name: "Kerem Taş", branch: "Satranç", totalClasses: 5 }
-    ],
-    lessons: Array(5).fill([
-      { name: "Fatma Öztürk", branch: "Türkçe" },
-      { name: "Mehmet Kılıç", branch: "Matematik" },
-      { name: "Seda Arı", branch: "İngilizce" },
-      { name: "Burak Yıldız", branch: "Beden Eğitimi" },
-      { name: "Deniz Polat", branch: "Resim" },
-      { name: "Cem Tuncer", branch: "Müzik" },
-      { name: "Selin Uysal", branch: "Fen Bilgisi" },
-      { name: "Kerem Taş", branch: "Satranç" }
-    ]).flat()
-  }
-];
+/* schedule = [{
+  classroom: string,
+  teachers: [{name: string, branch: string, totalClasses: number}]  
+}]*/
