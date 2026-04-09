@@ -1,4 +1,5 @@
 import { Days } from "../../../generated/prisma/enums";
+import { SchedulingContext, Subject } from "../../types";
 import { shuffleArray } from "../../utils/shuffleArray";
 
 const isSlotFree = (
@@ -15,24 +16,7 @@ const isSlotFree = (
   return !teacherSlots.has(teacherKey) && !classSlots.has(classKey);
 }
 
-// need to make sure the modulo check doesn't result in checking more hours than necessary
-const isDoubleSlotFree = (
-  teacherId: string,
-  classId: string,
-  day: Days,
-  hour: number,
-  teacherSlots: Set<string>,
-  classSlots: Set<string>
-) => {
-
-  if(hour % 2 === 0) return false;
-  return (
-    isSlotFree(teacherId, classId, day, hour, teacherSlots, classSlots) &&
-    isSlotFree(teacherId, classId, day, hour + 1, teacherSlots, classSlots)
-  );
-}
-
-const commitSlots = (
+export const commitSlots = (
   slots: {day: string, hour: number}[],
   teacherId: string,
   classId: string,
@@ -45,98 +29,98 @@ const commitSlots = (
   }
 }
 
-const findSingleSlots = (
+export const uncommitSlots = (
+  slots: {day: Days; hour: number}[],
   teacherId: string,
   classId: string,
   teacherSlots: Set<string>,
-  classSlots: Set<string>,
-  required: number,
-  shuffledDays: Days[],
-  shuffledHours: number[]
+  classSlots: Set<string>
 ) => {
-  const slots = [];
-
-  for (const day of shuffledDays){
-    let usedThisDay = false;
-
-    for(const hour of shuffledHours){
-      if(usedThisDay) break;
-
-      if(isSlotFree(teacherId, classId, day, hour, teacherSlots, classSlots)){
-        slots.push({day, hour});
-        usedThisDay= true;
-      }
-      if (slots.length >= required) break;
-    }
-    if (slots.length >= required) break;
+  for(const slot of slots){
+    teacherSlots.delete(`${teacherId}-${slot.day}-${slot.hour}`);
+    classSlots.delete(`${classId}-${slot.day}-${slot.hour}`);
   }
-
-  if (slots.length < required) {
-    throw new Error(`Unable to find ${required} free slots`);
-  }
-
-  return slots;
-}
-
-const findDoubleSlots = (
-  teacherId: string,
-  classId: string,
-  teacherSlots: Set<string>,
-  classSlots: Set<string>,
-  required: number,
-  shuffledDays:   Days[],
-  shuffledHours: number[]
-) => {
- 
-  const slots = [];
-
-  for (const day of shuffledDays){
-    let usedThisDay = false;
-
-    for(const hour of shuffledHours){
-      if(usedThisDay) break;
-
-      if(isDoubleSlotFree(teacherId, classId, day, hour, teacherSlots, classSlots)){
-        const nextHour = hour + 1;
-        slots.push({day, hour}, {day, hour: nextHour});
-        usedThisDay= true;
-      }
-      if (slots.length >= required) break;
-    }
-    if (slots.length >= required) break;
-  }
-
-  if (slots.length < required) {
-    throw new Error(`Unable to find ${required} free slots`);
-  }
-
-  return slots;
 }
 
 export const findAvailableSlots = (
   teacherId: string,
   classId: string,
-  teacherSlots: Set<string>,
-  classSlots: Set<string>,
-  required: number,
-  doubleDaily: boolean
+  context: SchedulingContext,
+  subject: Subject
 ) => {
-
-  if (doubleDaily && required % 2 !== 0) {
-  throw new Error("doubleDaily requires an even number of hours");
-  }
-
-  const hours = [1,2,3,4,5,6,7,8];
+  const hours = [1, 2, 3, 4, 5, 6, 7, 8];
   const days = Object.values(Days);
 
-  const shuffledDays = shuffleArray(days);
-  const shuffledHours = shuffleArray(hours);
+  const shuffledDays = shuffleArray([...days]);
+ 
+  let slots = searchDoubleSlots(teacherId, classId, context, subject.hours, shuffledDays)
 
-  const slots = doubleDaily 
-    ? findDoubleSlots(teacherId, classId, teacherSlots, classSlots, required, shuffledDays, shuffledHours)
-    : findSingleSlots(teacherId, classId, teacherSlots, classSlots, required, shuffledDays, shuffledHours);
+  if(!slots) {
+    slots = searchSingleSlots(teacherId, classId, context, subject.hours, shuffledDays, hours);
+  }
 
-  commitSlots(slots, teacherId, classId, teacherSlots, classSlots);
-
-  return slots;
+  if(slots) return slots;
+  return null;
 }
+
+const searchSingleSlots = (
+  teacherId: string,
+  classId: string,
+  context: SchedulingContext,
+  required: number,
+  shuffledDays: Days[],
+  shuffledHours: number[],
+) => {
+
+  const selectedSlots = [];
+
+  for(const day of shuffledDays) {
+    let usedThisDay = false;
+    for (const hour of shuffledHours) {
+      if (usedThisDay) break;
+
+      if (isSlotFree(teacherId, classId, day, hour, context.teacherSlots, context.classSlots)) {
+        selectedSlots.push({ day, hour });
+        usedThisDay = true;
+      }
+      if(selectedSlots.length === required) {
+        return selectedSlots;}
+    }
+  }
+  return null;
+}
+
+const searchDoubleSlots = (
+  teacherId: string,
+  classId: string,
+  context: SchedulingContext,
+  required: number,
+  shuffledDays: Days[],
+) => {
+  const selectedSlots = [];
+
+  const doubleHours = [1,3,5,7];
+  const shuffledHours = shuffleArray(doubleHours);
+
+ for (const day of shuffledDays) {
+    let usedThisDay = false;
+
+    for (const hour of shuffledHours) {
+      if(usedThisDay) break;
+
+      if (
+        isSlotFree(teacherId, classId, day, hour, context.teacherSlots, context.classSlots) &&
+        isSlotFree(teacherId, classId, day, hour + 1, context.teacherSlots, context.classSlots)
+      ) {
+        selectedSlots.push({ day, hour: hour }, { day, hour: hour + 1 });
+        usedThisDay = true;
+        
+        if (selectedSlots.length === required) {
+          return selectedSlots;}
+        break;
+      }
+    }
+  }
+  return null;
+}
+

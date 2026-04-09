@@ -1,5 +1,5 @@
 import type { Subject } from "../types";
-import { Branches } from "../../generated/prisma/enums";
+import { Branches, Days } from "../../generated/prisma/enums";
 
 export const allSubjects: Subject[] =[
   { grade: 'elementary', name: "Türkçe", hours: 10, doubleDaily: true },
@@ -33,7 +33,13 @@ export const branchMap: Record<string, Branches> = {
   'Satranç':       Branches.SATRANC,
 };
 
-
+export const dayMap: Record<Days, number> = {
+  [Days.MONDAY]: 0,
+  [Days.TUESDAY]: 1,
+  [Days.WEDNESDAY]: 2,
+  [Days.THURSDAY]: 3,
+  [Days.FRIDAY]: 4,
+};
 const CAN_TEACH_ALL_GRADES = new Set([ "Resim","Müzik","Beden Eğitimi","Satranç"]);
 
 export const ELEMENTARY_GRADES = [1,2,3,4];

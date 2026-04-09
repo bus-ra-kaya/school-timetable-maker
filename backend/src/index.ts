@@ -8,6 +8,8 @@ import cors from 'cors';
 import { prisma } from './prisma';
 import { mapTeachers } from './services/mapTeachers';
 import { buildSchedule } from './services/scheduling/buildSchedule';
+import { Days } from '../generated/prisma/enums';
+import { dayMap } from './data/subjects';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -19,8 +21,9 @@ app.use(cors({
 
 app.use(express.json());
 
-app.get('/api/schedule', (req, res) => {
-  res.status(200).json({result: true, data: null, error: null});
+app.get('/api/schedule', async (req, res) => {
+        
+    return res.status(200).json({result: true, data: null, error: null });
 });
 
 app.post('/api/create-schedule', async (req, res) => {
@@ -55,7 +58,7 @@ app.post('/api/create-schedule', async (req, res) => {
       });
 
       return schedule;
-    });
+    }, {timeout: 10000});
 
     const {result} = await buildSchedule(schedule.id);
 
@@ -68,8 +71,69 @@ app.post('/api/create-schedule', async (req, res) => {
       return res.status(500).json({result: false, error: 'Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz.' });
     }
 
-    console.log(result);
-    return res.status(200).json({result: true, data: null, error: null });
+    const scheduleData = await prisma.schedule.findUnique({
+      where: { id: schedule.id },
+      select: {
+        classrooms: {
+          select: {
+            name: true,
+            lessons: {
+              select: {
+                teacher: {
+                  select: {
+                    name: true,
+                    branch: true,
+                    hours: true,
+                  },
+                },
+                hour: true,
+                day: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    // ??
+
+    const hours = 8;
+    const days = 5;
+
+    const formatted = scheduleData?.classrooms.map((classroom) => {
+      const teacherMap: Record<string, { name: string; branch: string; totalClasses: number}> = {};
+
+      const lessons = Array(hours * days).fill(null);
+
+      for(const lesson of classroom.lessons) {
+        const t = lesson.teacher;
+
+        if(!teacherMap[t.name]) {
+          teacherMap[t.name] = {
+            name: t.name,
+            branch: t.branch,
+            totalClasses: t.hours,
+          }
+        }
+
+      const dayIndex = dayMap[lesson.day];
+      const hourIndex = lesson.hour -1;
+
+      const index = (dayIndex * hours) + hourIndex;
+
+      lessons[index] = {
+      name: t.name,
+      branch: t.branch,
+      };
+    }
+      return {
+        classroom: classroom.name,
+        teachers: Object.values(teacherMap),
+        lessons,
+      };
+    })
+    
+        
+    return res.status(200).json({result: true, data: formatted, error: null });
 
   } catch (err) {
     console.log(err);

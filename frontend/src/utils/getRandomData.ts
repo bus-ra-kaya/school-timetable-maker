@@ -35,7 +35,7 @@ export const getRandomData = () => {
     const totalHours = GRADE_COUNT * BRANCH_COUNT * s.hours;
     const needed = Math.ceil(totalHours / MAX_HOURS_PER_TEACHER);
 
-    for(let i = 0; i < needed; i++){
+    for(let i = 0; i < needed ; i++){
       teachers.push({id: nanoid(), name: getRandomName(), branch: s.name, placeholder: ''},);
     }
   })
@@ -45,7 +45,7 @@ gradeSpecificSubjects.forEach(s => {
   const totalHours = gradeCount * BRANCH_COUNT * s.hours;
   const needed = Math.ceil(totalHours / MAX_HOURS_PER_TEACHER);
 
-    for(let i =0; i < needed; i++){
+    for(let i =0; i < needed +4; i++){
       teachers.push({id: nanoid(), name: getRandomName(), branch: s.name, placeholder: ''},);
     }
 })

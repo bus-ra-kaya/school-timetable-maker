@@ -1,13 +1,8 @@
-import { Days, Grades} from "../generated/prisma/enums";
+import { Branches, Days, Grades} from "../generated/prisma/enums";
 
 export type lessonSlot = {
   name: string;
   branch: string;
-};
-
-export type DateSlot = {
-  day: Days;
-  hour: number;
 };
 
 export type Subject = {
@@ -43,4 +38,28 @@ export type Classroom = {
   id: string,
   name: string,
   grade: Grades
+}
+
+export type ScheduledLesson = {
+  branch: Branches;
+  teacher_id: string;
+  class_id: string;
+  scheduleId: string;
+  day: Days;
+  hour: number;
+}
+
+export type SchedulePlan = {
+  lessons: ScheduledLesson[];
+  teacherHourUpdates: {
+    id: string;
+    hours: number;
+    grade: Grades | null
+  }[]
+}
+
+export type SchedulingContext = {
+  teacherSlots: Set<string>;
+  classSlots: Set<string>;
+  teachers: TeacherWithLoad[];
 }

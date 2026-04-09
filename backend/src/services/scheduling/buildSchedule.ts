@@ -1,44 +1,80 @@
 import {prisma} from '../../prisma';
-import { TeacherWithLoad, Classroom, Subject, DateSlot } from "../../types";
+import { TeacherWithLoad, Classroom, Subject, SchedulePlan, ScheduledLesson, SchedulingContext } from "../../types";
 import { allSubjects, branchMap, gradeSpecificSubjects, MAX_HOURS_PER_TEACHER } from "../../data/subjects";
-import { shuffleArray } from "../../utils/shuffleArray";
 import { Grades } from "../../../generated/prisma/enums";
-import { findAvailableSlots } from './findAvailableSlots';
+import { commitSlots, findAvailableSlots, uncommitSlots } from './findAvailableSlots';
 
-type SchedulingContext = {
-  teacherSlots: Set<string>;
-  classSlots: Set<string>;
-  teachers: TeacherWithLoad[];
+const solve = (
+  subjectIndex: number,
+  scheduleId: string,
+  context: SchedulingContext,
+  classrooms: Classroom[],
+  lessons: ScheduledLesson[],
+  subjectsToSchedule: Subject[],
+):boolean => {
+
+  if (subjectIndex === subjectsToSchedule.length) return true;
+
+  const subject = subjectsToSchedule[subjectIndex];
+  const branch = branchMap[subject.name];
+  const relevantClassrooms = getRelevantClassrooms(subject, classrooms);
+  const eligibleTeachers = getEligibleTeachers(context.teachers, branch);
+ 
+  for(const classroom of relevantClassrooms){
+    for(const teacher of eligibleTeachers){
+      if(!isTeacherEligible(teacher, subject)) continue;
+
+      const slots = findAvailableSlots(
+        teacher.id,
+        classroom.id,
+        context,
+        subject
+      );
+
+      const previousGrade = teacher.grade;
+
+      if(slots){
+        commitSlots(slots, teacher.id, classroom.id, context.teacherSlots, context.classSlots);
+        teacher.assignedHours += subject.hours;
+        updateTeacherGradeIfNeeded(teacher, subject);
+
+        const addedLessons = slots.map(s => ({branch, teacher_id: teacher.id, class_id: classroom.id,scheduleId, ...s }));
+        lessons.push(...addedLessons);
+
+        if (solve(subjectIndex + 1, scheduleId, context, classrooms, lessons, subjectsToSchedule)) {
+          return true;
+        }
+
+        teacher.assignedHours -= subject.hours;
+        teacher.grade = previousGrade;
+        uncommitSlots(slots, teacher.id, classroom.id, context.teacherSlots, context.classSlots);
+        for(const _ of slots) lessons.pop();
+      }
+    }
+  }
+  return false;
 }
 
-const persistLessons = async (
-  scheduleId: string,
-  teacher: TeacherWithLoad,
-  classroom: Classroom,
-  subject: Subject,
-  slots: DateSlot[],
-) =>  {
-  await prisma.$transaction(async (tx) => {
-    await tx.lesson.createMany({
-      data: slots.map(slot => ({
-        branch: branchMap[subject.name],
-        teacher_id: teacher.id,
-        class_id: classroom.id,
-        scheduleId,
-        day: slot.day,
-        hour: slot.hour,
-      })),
-    });
+export const buildSchedule = async (scheduleId: string) => {
+  const {teachers, classrooms } = await loadRequiredData(scheduleId);
+  const context = createSchedulingContext(teachers);
+  const lessons: ScheduledLesson[] = [];
 
-    await tx.teacher.update({
-      where: { id: teacher.id },
-      data: {
-        hours: { increment: subject.hours },
-        grade: teacher.grade,
-      },
-    });
-  });
-};
+  const sortedSubjects = [...allSubjects].sort((a, b) => b.hours - a.hours);
+
+  const success = solve(0, scheduleId, context, classrooms, lessons, sortedSubjects);
+
+  if(success) {
+    const teacherHourUpdates = context.teachers.map(t => ({
+    id: t.id,
+    hours: t.assignedHours,
+    grade: t.grade,
+  }));
+    await persistSchedule({lessons, teacherHourUpdates});
+    return {result: true};
+  }
+  return {result: false};
+}
 
 const updateTeacherGradeIfNeeded = (
   teacher: TeacherWithLoad,
@@ -73,46 +109,6 @@ const isTeacherEligible = (t: TeacherWithLoad, subject: Subject) => {
   return true;
 };
 
-const assignToClassroom = async (
-  subject: Subject,
-  classroom: Classroom,
-  teachers: TeacherWithLoad[],
-  scheduleId: string,
-  context: SchedulingContext
-): Promise<boolean> => {
-  
-  for(const teacher of teachers) {
-    if(!isTeacherEligible(teacher, subject)) continue;
-
-    try {
-      const slots = findAvailableSlots(
-        teacher.id,
-        classroom.id,
-        context.teacherSlots,
-        context.classSlots,
-        subject.hours,
-        subject.doubleDaily
-      );
-
-      updateTeacherGradeIfNeeded(teacher, subject);
-
-      await persistLessons(
-        scheduleId,
-        teacher,
-        classroom,
-        subject,
-        slots
-      );
-      teacher.assignedHours += subject.hours;
-      return true;
-
-    } catch (e) {
-      console.error(`Error assigning ${subject.name}`, e);
-    }
-  }
-  return false;
-}
-
 const getRelevantClassrooms = (
   subject: Subject,
   classrooms: Classroom[]
@@ -132,109 +128,48 @@ const getEligibleTeachers = (
   teachers: TeacherWithLoad[],
   branch: string
 ) => {
-  return shuffleArray(teachers.filter(t => t.branch === branch));
+  return teachers.filter(t => t.branch === branch);
 };
 
-const assignSubject = async (
-  subject: Subject,
-  scheduleId: string,
-  context: SchedulingContext,
-  classrooms: Classroom[]
-): Promise<boolean> => {
+const loadRequiredData = async (scheduleId: string) => {
+  const [classrooms, rawTeachers] = await Promise.all([
+    prisma.classroom.findMany({ where: { scheduleId } }),
+    prisma.teacher.findMany({ where: { scheduleId } }),
+  ]);
 
-  const branch = branchMap[subject.name];
-  const eligibleTeachers = getEligibleTeachers(context.teachers, branch);
-  const relevantClassrooms = getRelevantClassrooms(subject, classrooms);
+  if (!classrooms.length) throw new Error(`No classrooms found for schedule ${scheduleId}`);
+  if (!rawTeachers.length) throw new Error(`No teachers found for schedule ${scheduleId}`);
 
-  for(const classroom of relevantClassrooms){
-    const success = await assignToClassroom(
-      subject,
-      classroom,
-      eligibleTeachers,
-      scheduleId,
-      context
-    );
-
-    if (!success) {
-      console.log(`Couldn't place ${subject.name} in ${classroom.name}`);
-      return false;
-    }
-  }
-  return true;
-}
-
-const createSchedulingContext = (teachers: TeacherWithLoad[]) => {
-  const teacherSlots = new Set<string>();
-  const classSlots = new Set<string>();
-
-  teachers.forEach(t => {
-    t.assignedHours = 0;
-    t.grade = null;
-  });
-
-  return { teacherSlots, classSlots, teachers };
-};
-
-const handleFailure = async (scheduleId: string) => {
-  await prisma.lesson.deleteMany({ where: { scheduleId } });
-
-  await prisma.teacher.updateMany({
-    where: { scheduleId },
-    data: { hours: 0, grade: null },
-  });
-};
-
-const tryBuildSchedule = async (
-  scheduleId: string, 
-  teachers: TeacherWithLoad[],
-  classrooms: Classroom[]
-):Promise<boolean> => {
-
-  const context = createSchedulingContext(teachers);
-
-  for(const subject of allSubjects){
-    const success = await assignSubject(
-      subject,
-      scheduleId,
-      context,
-      classrooms
-    );
-
-    if(!success){
-      await handleFailure(scheduleId);
-      return false;
-    }
-  }
-  return true;
-}
-
-const getNormalizedData = async (scheduleId: string) => {
-  const classrooms = await prisma.classroom.findMany({
-    where: {
-      scheduleId: scheduleId},
-    })
-  const rawTeachers = await prisma.teacher.findMany({
-    where: {
-      scheduleId: scheduleId},
-    });
-
-  const teachers: TeacherWithLoad[] = rawTeachers.map(teacher => ({
-  ...teacher,
-  assignedHours: 0,
+  const teachers: TeacherWithLoad[] = rawTeachers.map(t => ({
+    ...t,
+    assignedHours: 0,
+    grade: null,
   }));
 
-  return {teachers, classrooms};
-}
+  return { classrooms, teachers };
+};
 
-export const buildSchedule = async (scheduleId: string) => {
-  const {teachers, classrooms} = await getNormalizedData(scheduleId);
+const persistSchedule = async (plan: SchedulePlan) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.lesson.createMany({ data: plan.lessons });
 
-  const maxRetries = 2;
-  for(let attempt = 0; attempt < maxRetries; attempt++){
-    const success = await tryBuildSchedule(scheduleId, teachers,classrooms);
-    if(success) return {result: true};
-  }
+    await Promise.all(
+      plan.teacherHourUpdates.map(({ id, hours, grade }) =>
+        tx.teacher.update({
+          where: { id },
+          data: { hours, grade },
+        },)
+      )
+    );
+  }, {timeout: 10000});
+};
 
-  console.warn(`Failed after ${maxRetries} attempts of trying build a schedule`);
-  return { result: false};
-}
+const createSchedulingContext = (teachers: TeacherWithLoad[]): SchedulingContext => {
+  return {
+    teacherSlots: new Set<string>(),
+    classSlots: new Set<string>(),
+    teachers,
+  };
+};
+
+
