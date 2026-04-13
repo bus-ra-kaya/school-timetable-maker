@@ -37,7 +37,8 @@ export type TeacherWithLoad = {
 export type Classroom = {
   id: string,
   name: string,
-  grade: Grades
+  grade: Grades,
+  year: number
 }
 
 export type ScheduledLesson = {

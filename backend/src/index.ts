@@ -8,7 +8,6 @@ import cors from 'cors';
 import { prisma } from './prisma';
 import { mapTeachers } from './services/mapTeachers';
 import { buildSchedule } from './services/scheduling/buildSchedule';
-import { Days } from '../generated/prisma/enums';
 import { dayMap } from './data/subjects';
 
 const app = express();
@@ -60,7 +59,7 @@ app.post('/api/create-schedule', async (req, res) => {
       return schedule;
     }, {timeout: 10000});
 
-    const {result} = await buildSchedule(schedule.id);
+    const result = await buildSchedule(schedule.id);
 
     if (!result) {
       await prisma.lesson.deleteMany({ where: { scheduleId: schedule.id } });
@@ -94,7 +93,6 @@ app.post('/api/create-schedule', async (req, res) => {
         },
       },
     });
-    // ??
 
     const hours = 8;
     const days = 5;
@@ -111,9 +109,10 @@ app.post('/api/create-schedule', async (req, res) => {
           teacherMap[t.name] = {
             name: t.name,
             branch: t.branch,
-            totalClasses: t.hours,
+            totalClasses: 0,
           }
         }
+        teacherMap[t.name].totalClasses += 1;
 
       const dayIndex = dayMap[lesson.day];
       const hourIndex = lesson.hour -1;

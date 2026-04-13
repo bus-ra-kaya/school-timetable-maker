@@ -66,6 +66,7 @@ model teacher {
 model classroom {
   id          String @id @default(cuid())
   name        String
+  year        Int
   grade       Grades
 
   scheduleId  String

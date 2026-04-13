@@ -1,5 +1,5 @@
 import { Days } from "../../../generated/prisma/enums";
-import { SchedulingContext, Subject } from "../../types";
+import { Subject, SchedulingContext } from "../../types";
 import { shuffleArray } from "../../utils/shuffleArray";
 
 const isSlotFree = (
