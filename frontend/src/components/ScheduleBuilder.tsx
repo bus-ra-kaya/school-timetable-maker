@@ -10,7 +10,7 @@ import Modal from "./Modal";
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../utils/validateData";
-import { createSchedule } from "../utils/createSchedule";
+import { createSchedule } from "../services/createSchedule";
 import type { TeacherData, ClassData, ClassroomSchedule } from "../types";
 import s from "../style/ScheduleBuilder.module.css";
 
@@ -114,13 +114,13 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
         new Promise(resolve => setTimeout(resolve, 1000))
       ]);
 
-      if(!schedule.result || !schedule.data ){
+      if(!schedule.data ){
         setToast({message:'Program oluşturulurken bir hata oluştu.', type: 'error'});
         lastSubmittedRef.current = {teachers, classes};
         return;
       }
-      navigate('/schedule');
-      onScheduleCreated(schedule.data);
+      navigate(`/schedule/${schedule.data.scheduleId}`);
+      onScheduleCreated(schedule.data.schedule);
       } catch (err) {
       if(import.meta.env.NODE_ENV === 'development'){
       console.error(err);

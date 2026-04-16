@@ -3,16 +3,23 @@ import ScheduleBuilder from './components/ScheduleBuilder';
 import Schedule from './components/Schedule';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
-import {Routes, Route, Navigate} from 'react-router-dom';
-import { useSchedule } from './hooks/useSchedule';
+import {Routes, Route} from 'react-router-dom';
 import { useState } from 'react';
-import type { ClassroomSchedule } from './types';
+import ScheduleList from './components/ScheduleList';
 
 function App() {
-  const {schedule, isLoading, error, clearError, saveSchedule} = useSchedule();
   const [toast, setToast] = useState<boolean>(false);
 
-  if (isLoading) return <div>Yükleniyor...</div>;
+  const builderElement = (
+    <div className="pageContainer">
+      <ScheduleList />
+      <ScheduleBuilder
+        onScheduleCreated={() => {
+          setToast(true);
+        }}
+      />
+    </div>
+  );
 
   return (
     <div className='page'>
@@ -20,23 +27,16 @@ function App() {
         <Routes>
           <Route
             path='/'
-            element={schedule.length > 0
-              ? <Navigate to='/schedule' />
-              : <Navigate to='/create-schedule' />
-            }
+            element={builderElement}
           />
           <Route
             path='/create-schedule'
-            element={ 
-              <ScheduleBuilder onScheduleCreated={(schedule: ClassroomSchedule[]) => {
-                saveSchedule(schedule);
-                setToast(true);
-              }} />} > 
+            element={builderElement}> 
           </Route>
           <Route
-            path='/schedule'
+            path='/schedule/:id'
             element={ 
-              <Schedule schedule={schedule} />
+              <Schedule  />
             }>
           </Route>
           <Route path='*' element={<h1>404 - Page Not Found</h1>}></Route>
@@ -49,17 +49,10 @@ function App() {
           onClose={() => {setToast(false)}}
         />
       )}
-      {error && (
-        <Toast
-          message={error}
-          onClose={clearError}
-        />
-      )}
       <div className="footer">
         <Footer />
       </div>
     </div>
   )
-
 }
 export default App;

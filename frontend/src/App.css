@@ -27,6 +27,11 @@
   word-spacing: 0.05em;
 }
 
+.pageContainer {
+  display: flex;
+  gap: 2rem;
+}
+
 /* ToastNotification.tsx */ 
 
 .error {

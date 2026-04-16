@@ -69,14 +69,15 @@ const searchSingleSlots = (
   context: SchedulingContext,
   required: number,
   shuffledDays: Days[],
-  shuffledHours: number[],
+  hours: number[],
 ) => {
 
   const selectedSlots = [];
 
   for(const day of shuffledDays) {
     let usedThisDay = false;
-    for (const hour of shuffledHours) {
+    const hoursForDay = shuffleArray(hours);
+    for (const hour of hoursForDay) {
       if (usedThisDay) break;
 
       if (isSlotFree(teacherId, classId, day, hour, context.teacherSlots, context.classSlots)) {
@@ -100,12 +101,12 @@ const searchDoubleSlots = (
   const selectedSlots = [];
 
   const doubleHours = [1,3,5,7];
-  const shuffledHours = shuffleArray(doubleHours);
 
  for (const day of shuffledDays) {
     let usedThisDay = false;
 
-    for (const hour of shuffledHours) {
+    const hoursForDay = shuffleArray(doubleHours);
+    for (const hour of hoursForDay) {
       if(usedThisDay) break;
 
       if (

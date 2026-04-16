@@ -5,8 +5,6 @@ import { TeacherWithLoad, Classroom, ScheduledLesson, Subject, SchedulePlan } fr
 import { shuffleArray } from "../../utils/shuffleArray";
 import { commitSlots, findAvailableSlots } from "./findAvailableSlots";
 
-const HOURS_PER_CLASSROOM = 40;
-
 type SolverResult = {
   lessons: ScheduledLesson[];
   teachers: TeacherWithLoad[];
@@ -24,7 +22,6 @@ const solveYear = (
 ):SolverResult | null => {
 
   if(yearIndex >= allYears.length) return {lessons: [], teachers, teacherSlots, classSlots};
-  console.log(`--- Processing Year Group: ${allYears[yearIndex][0]?.year} ---`);
 
   const yearResult = solveClassroomList(
     0,
@@ -140,11 +137,14 @@ const solveSubjectsForClass = (
       
       commitSlots(slots, teacher.id, classroom.id, nextTeacherSlots, nextClassSlots);
 
-      const updatedTeachers = currentTeachers.map(t =>
-        t.id === teacher.id
-          ? { ...t, assignedHours: t.assignedHours + subject.hours, grade: getNewGrade(t, subject) }
-          : t
-      );
+      const index = currentTeachers.findIndex(t => t.id === teacher.id);
+
+      const updatedTeachers = [...currentTeachers];
+      updatedTeachers[index] = {
+        ...updatedTeachers[index],
+        assignedHours: updatedTeachers[index].assignedHours + subject.hours,
+        grade: getNewGrade(updatedTeachers[index], subject),
+      };
 
       const addedLessons = slots.map(s => ({
         branch, teacher_id: teacher.id, class_id: classroom.id, scheduleId, ...s
@@ -239,12 +239,11 @@ export const buildSchedule = async (scheduleId: string) => {
     scheduleId);
 
   if(!finalResult) {
-    console.log('COuld not generate a valid schedule with these constraints');
+    console.log('Could not generate a valid schedule with these constraints');
     return {result: false};
   }
 
   if(finalResult) {
-    console.log('SUCCESS AT LAST');
     await persistSchedule({
       lessons: finalResult.lessons,
       teacherHourUpdates: finalResult.teachers.map(t => ({
@@ -254,7 +253,7 @@ export const buildSchedule = async (scheduleId: string) => {
       }))
     });
     return {result: true};
-}
+  }
 }
 const persistSchedule = async (plan: SchedulePlan) => {
   await prisma.$transaction( async (tx) => {

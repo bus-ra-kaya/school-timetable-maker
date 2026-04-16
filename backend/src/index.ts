@@ -20,9 +20,85 @@ app.use(cors({
 
 app.use(express.json());
 
-app.get('/api/schedule', async (req, res) => {
+app.get('/api/created-schedules', async (req, res) => {
+  try {
+    const schedules = await prisma.schedule.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+    res.status(200).json({data: schedules});
+  } catch (err){
+    console.log(err);
+    res.status(500).json({error: "Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz." });
+  }
+})
+
+app.post('/api/schedule', async (req, res) => {
+
+  const {scheduleId} = req.body;
+
+  const scheduleData = await prisma.schedule.findUnique({
+      where: { id: scheduleId },
+      select: {
+        classrooms: {
+          select: {
+            name: true,
+            lessons: {
+              select: {
+                teacher: {
+                  select: {
+                    id: true,
+                    name: true,
+                    branch: true,
+                    hours: true,
+                  },
+                },
+                hour: true,
+                day: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const hours = 8;
+    const days = 5;
+    const formatted = scheduleData?.classrooms.map((classroom) => {
+      const teacherMap: Record<string, { name: string; branch: string; totalClasses: number}> = {};
+
+      const lessons = Array(hours * days).fill(null);
+
+      for(const lesson of classroom.lessons) {
+        const t = lesson.teacher;
+
+        if(!teacherMap[t.id]) {
+          teacherMap[t.id] = {
+            name: t.name,
+            branch: t.branch,
+            totalClasses: 0,
+          }
+        }
+        teacherMap[t.id].totalClasses += 1;
+
+      const dayIndex = dayMap[lesson.day];
+      const hourIndex = lesson.hour -1;
+
+      const index = (dayIndex * hours) + hourIndex;
+
+      lessons[index] = {
+      name: t.name,
+      branch: t.branch,
+      };
+    }
+      return {
+        classroom: classroom.name,
+        teachers: Object.values(teacherMap),
+        lessons,
+      };
+    })
         
-    return res.status(200).json({result: true, data: null, error: null });
+    return res.status(200).json({result: true, data: {schedule: formatted, scheduleId: scheduleId}, error: null });
 });
 
 app.post('/api/create-schedule', async (req, res) => {
@@ -80,6 +156,7 @@ app.post('/api/create-schedule', async (req, res) => {
               select: {
                 teacher: {
                   select: {
+                    id: true,
                     name: true,
                     branch: true,
                     hours: true,
@@ -96,7 +173,6 @@ app.post('/api/create-schedule', async (req, res) => {
 
     const hours = 8;
     const days = 5;
-
     const formatted = scheduleData?.classrooms.map((classroom) => {
       const teacherMap: Record<string, { name: string; branch: string; totalClasses: number}> = {};
 
@@ -105,14 +181,14 @@ app.post('/api/create-schedule', async (req, res) => {
       for(const lesson of classroom.lessons) {
         const t = lesson.teacher;
 
-        if(!teacherMap[t.name]) {
-          teacherMap[t.name] = {
+        if(!teacherMap[t.id]) {
+          teacherMap[t.id] = {
             name: t.name,
             branch: t.branch,
             totalClasses: 0,
           }
         }
-        teacherMap[t.name].totalClasses += 1;
+        teacherMap[t.id].totalClasses += 1;
 
       const dayIndex = dayMap[lesson.day];
       const hourIndex = lesson.hour -1;
@@ -130,9 +206,8 @@ app.post('/api/create-schedule', async (req, res) => {
         lessons,
       };
     })
-    
         
-    return res.status(200).json({result: true, data: formatted, error: null });
+    return res.status(200).json({result: true, data: {schedule: formatted, scheduleId: schedule.id}, error: null });
 
   } catch (err) {
     console.log(err);
@@ -148,8 +223,3 @@ app.get("/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
-
-/* schedule = [{
-  classroom: string,
-  teachers: [{name: string, branch: string, totalClasses: number}]  
-}]*/

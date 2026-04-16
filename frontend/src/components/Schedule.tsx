@@ -1,28 +1,51 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftFromLine, FileDown } from 'lucide-react';
 import Modal from './Modal';
 import { exportSchedule } from '../services/exportSchedule';
-import type { ClassroomSchedule } from '../types';
 import s from '../style/Schedule.module.css';
+import type { ClassroomSchedule } from '../types';
+import { fetchSchedule } from '../services/fetchSchedule';
 
 
 const HOUR_COUNT = 8;
 const DAYS_COUNT = 5;
 
-type ScheduleProps = {
-  schedule: ClassroomSchedule[];
-}
-
-export default function Schedule({schedule}: ScheduleProps){
+export default function Schedule(){
 
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [schedule, setSchedule] = useState<ClassroomSchedule[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+ useEffect(() => {
+  if (!id) return;
+
+  const load = async () => {
+    try {
+      const data = await fetchSchedule(id);
+      if (data.data?.schedule) {
+        setSchedule(data.data.schedule);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  load();
+}, [id]);
 
   //export option states
   const [open, setOpen] = useState<boolean>(false);
 
   const [exportMode, setExportMode] = useState<'all' | 'single'>('all');
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
+
+  if (loading) return <div>Yükleniyor...</div>;
+  if(!schedule) return <div>Program bulunamadı</div>
 
   return(
    <div className={s.scheduleContainer}>
