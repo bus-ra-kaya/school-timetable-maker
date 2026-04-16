@@ -1,5 +1,5 @@
 import type { TeacherData, ClassData } from "../types";
-import { allSubjects } from "../data/subjects";
+import { allSubjects } from "../assets/data/subjects";
 
 const ELEMENTARY_GRADES = [1,2,3,4];
 const MIDDLE_HIGH_GRADES = [5,6,7,8,9,10,11,12];
@@ -61,7 +61,6 @@ const hasAllGrades = (classes: ClassData[]): boolean => {
 }
 
 const checkTeacherShortages = (teachers: TeacherData[]) => {
-
   const shortages = new Set<string>();
   const countByBranch = teachers.reduce<Record<string, number>>(
     (acc, teacher) => {
@@ -75,25 +74,29 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
   const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));
 
   multiGradeSubjects.forEach(s => {
-    const totalHours = GRADE_COUNT * BRANCH_COUNT * s.hours;
-    const needed = Math.ceil(totalHours /MAX_HOURS_PER_TEACHER);
+    const needed = GRADE_COUNT * BRANCH_COUNT;
+    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
-    if(!countByBranch[s.name] || countByBranch[s.name] < needed){
+    if(totalCapacity < needed){
       shortages.add(s.name);
     }
   });
 
   gradeSpecificSubjects.forEach(s => {
     const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
-    const totalHours = gradeCount * BRANCH_COUNT * s.hours;
-    const needed = Math.ceil(totalHours /MAX_HOURS_PER_TEACHER);
+    const needed = gradeCount * BRANCH_COUNT + 6;
+    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
-    if(!countByBranch[s.name] || countByBranch[s.name] < needed){
+    if(totalCapacity < needed){
       shortages.add(s.name);
     } else {
-      countByBranch[s.name] -= needed;
+      countByBranch[s.name] -= Math.ceil(needed /canTeach);
     }
   })
 
   return Array.from(shortages);
 }
+
+// need to get rid of the magic number 6 somehow

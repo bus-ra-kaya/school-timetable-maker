@@ -21,7 +21,7 @@ export default function Toast({message, type = 'error', duration = 3000, onClose
           clearInterval(timer);
           return 0;
         }
-        return prev - step <= 0 ? 0 : prev - step;
+        return Math.max(0, prev - step);
       })
     }, interval);
 
@@ -37,9 +37,9 @@ export default function Toast({message, type = 'error', duration = 3000, onClose
   }, [progress, onClose]);
 
   return (
-    <div
-      role={type == 'error' ? 'alert' : 'status'}
-      aria-atomic='true'
+    <output
+      role={type === 'error' ? 'alert' : undefined}
+      aria-atomic="true"
       className={`${s.toastContainer} ${type === 'error' ? s.error : s.info}`}
     >
       <button
@@ -56,6 +56,6 @@ export default function Toast({message, type = 'error', duration = 3000, onClose
         className={s.toastLine} 
         style={{width: `${progress}%`}}
       ></div>
-    </div>
+    </output>
   )
 }

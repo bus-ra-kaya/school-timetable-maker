@@ -139,19 +139,28 @@
   box-shadow: 0px 2px 6px rgb(0, 0, 0, 0.1); 
 }
 
-@media (max-width: 550px){
-
-  body{
-  font-size: 0.8rem;
-  }
-
-  button {
-    font-size: 0.8em;
-  }
-
-  .tableBuilder{
-    flex-direction: column;
+@media (max-width: 700px){
+  .tableBuilder {
+    width: 400px;
   }
 }
 
+@media (max-width: 500px){
+  .tableBuilder {
+    width: 350px;
+  }
+}
+
+@media (max-width: 400px){
+  .title {
+    font-size: 1.2rem;
+  }
+
+  button {
+    font-size: 0.8rem;
+  }
+  .tableBuilder {
+    width: 300px;
+  }
+}
 

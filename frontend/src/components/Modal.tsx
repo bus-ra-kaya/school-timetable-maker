@@ -42,7 +42,6 @@ export default function Modal({children, confirmText = 'Evet', cancelText= 'HayÄ
         <div
           ref={modalRef}
           className={s.modal}
-          role='dialog'
           aria-modal='true'
           tabIndex={-1}
           aria-describedby={descId}
@@ -55,6 +54,7 @@ export default function Modal({children, confirmText = 'Evet', cancelText= 'HayÄ
             <button type='button' onClick={onConfirm}>{confirmText}</button>
             <button type='button' onClick={onCancel}>{cancelText}</button>
           </div>
+
         </div>
       </div>
     </FocusTrap> 

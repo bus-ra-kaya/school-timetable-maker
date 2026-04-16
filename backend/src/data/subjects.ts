@@ -33,6 +33,10 @@ export const branchMap: Record<string, Branches> = {
   'Satranç':       Branches.SATRANC,
 };
 
+export const branchLabelMap = Object.fromEntries(
+  Object.entries(branchMap).map(([label, value]) => [value, label])
+) as Record<Branches, string>;
+
 export const dayMap: Record<Days, number> = {
   [Days.MONDAY]: 0,
   [Days.TUESDAY]: 1,

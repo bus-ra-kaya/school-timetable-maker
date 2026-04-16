@@ -1,6 +1,6 @@
 import type { TeacherData, ClassData } from "../types";
 import { getRandomName } from "./getRandomName";
-import { allSubjects } from "../data/subjects";
+import { allSubjects } from "../assets/data/subjects";
 import { nanoid } from 'nanoid';
 
 const ELEMENTARY_GRADES = [1,2,3,4];
@@ -32,22 +32,24 @@ export const getRandomData = () => {
   const gradeSpecificSubjects = allSubjects.filter(s => !CAN_TEACH_ALL_GRADES.has(s.name));
 
   multiGradeSubjects.forEach(s => {
-    const totalHours = GRADE_COUNT * BRANCH_COUNT * s.hours;
-    const needed = Math.ceil(totalHours / MAX_HOURS_PER_TEACHER);
+    const classCount = GRADE_COUNT * BRANCH_COUNT;
+    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const needed = Math.ceil(classCount / canTeach);
 
-    for(let i = 0; i < needed ; i++){
+    for(let i =0; i < needed; i++){
       teachers.push({id: nanoid(), name: getRandomName(), branch: s.name, placeholder: ''},);
     }
   })
 
-gradeSpecificSubjects.forEach(s => {
-  const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
-  const totalHours = gradeCount * BRANCH_COUNT * s.hours;
-  const needed = Math.ceil(totalHours / MAX_HOURS_PER_TEACHER);
+  gradeSpecificSubjects.forEach(s => {
+    const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
+    const classCount = gradeCount * BRANCH_COUNT;
+    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const needed = Math.ceil(classCount / canTeach);
 
-    for(let i =0; i < needed +4; i++){
+    for(let i =0; i < needed + 3; i++){
       teachers.push({id: nanoid(), name: getRandomName(), branch: s.name, placeholder: ''},);
     }
-})
+  })
   return {teachers, classes};
 }

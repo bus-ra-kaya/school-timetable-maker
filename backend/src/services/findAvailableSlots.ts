@@ -1,6 +1,6 @@
-import { Days } from "../../../generated/prisma/enums";
-import { Subject, SchedulingContext } from "../../types";
-import { shuffleArray } from "../../utils/shuffleArray";
+import { Days } from "../../generated/prisma/enums";
+import { Subject, SchedulingContext } from "../types";
+import { shuffleArray } from "../utils/shuffleArray";
 
 const isSlotFree = (
   teacherId: string,

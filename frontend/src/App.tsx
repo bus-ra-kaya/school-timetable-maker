@@ -1,6 +1,6 @@
 import './App.css';
 import ScheduleBuilder from './components/ScheduleBuilder';
-import Schedule from './components/Schedule';
+import Schedule from './components/Schedule/Schedule';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 import {Routes, Route} from 'react-router-dom';
