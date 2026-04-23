@@ -22,7 +22,7 @@ export const fetchScheduleLists = async (): Promise<ReturnValue> => {
           console.log(err);
         }
       } 
-      return {data: null, error: 'Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz.'};
+      return {data: null, error: 'Sunucuya bağlanılamıyor. Lütfen daha sonra tekrar deneyiniz.'};
     }
     const body = await response.json();
     return {data: body.data, error: null};

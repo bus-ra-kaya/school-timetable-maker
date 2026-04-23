@@ -15,6 +15,9 @@ export default function ScheduleList() {
   const load = async () => {
     try {
       const res = await fetchScheduleLists();
+      if(res.error){
+        setError(res.error);
+      }
       setData(res.data);
     } catch (err) {
       setError('Kaydedilmiş programlar yüklenirken sistemsel bir hata yaşandı.');
@@ -30,26 +33,36 @@ export default function ScheduleList() {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <main aria-label='Kaydedilmiş programlar'>
       <div className={s.listContainer} >
-        <header> Son kaydedilmiş programlar:</header>
+        <h2> Son kaydedilmiş programlar:</h2>
         <div>
           <div className={s.cardList}>
-            {data?.map((item) => (
-              <button key={item.id} className={s.card}  onClick={() => {
-              navigate(`/schedule/${item.id}`);
-            }}>
-                <FileText />
+            {data?.map((item) => {
+              const dateLabel = new Date(item.createdAt).toLocaleString('tr-TR');
+              return (
+              <button 
+                key={item.id} 
+                aria-label={`${dateLabel} tarihli programı görüntüle`}
+                className={s.card}  
+                onClick={() => navigate(`/schedule/${item.id}`)}
+              >
+                <FileText aria-hidden='true' />
                 <div>
-                    <span className={s.date}> {new Date(item.createdAt).toLocaleString("tr-TR")} </span> tarihli program
+                    <span className={s.date}>{dateLabel}</span> tarihli program
                 </div>
               </button>
-            ))}
+            )})}
             {listLoading && (
-              <p>Yükleniyor...</p>
+              <p role='status' aria-live='polite'> Yükleniyor...</p>
             )}
             {!listLoading && Array.isArray(data) && data.length === 0 && (
-              <p className={s.placeholder}>Sistemde kayıtlı program bulunmamaktadır.</p>
+              <p className={s.placeholder} aria-live='polite'>
+                Sistemde kayıtlı program bulunmamaktadır.
+              </p>
+            )}
+            {!listLoading && !data && !error && (
+              <p className={s.placeholder}>Veri alınamadı.</p>
             )}
           </div>
         </div>
@@ -60,6 +73,6 @@ export default function ScheduleList() {
                 onClose={() => setError(null)}
               />
             )}
-    </div>
+    </main>
   )
 }

@@ -1,5 +1,5 @@
-import type { Subject } from "../types";
-import { Branches, Days } from "../../generated/prisma/enums";
+import type { Subject } from "../types.js";
+import { Branches, Days } from "../generated/prisma/enums.js";
 
 export const allSubjects: Subject[] =[
   { grade: 'elementary', name: "Türkçe", hours: 10, doubleDaily: true },
@@ -32,6 +32,10 @@ export const branchMap: Record<string, Branches> = {
   'Fen Bilgisi':   Branches.FEN_BILGISI,
   'Satranç':       Branches.SATRANC,
 };
+
+export const branchLabelMap = Object.fromEntries(
+  Object.entries(branchMap).map(([label, value]) => [value, label])
+) as Record<Branches, string>;
 
 export const dayMap: Record<Days, number> = {
   [Days.MONDAY]: 0,

@@ -14,7 +14,6 @@
   padding: 1.5rem;
   border-radius: 10px;
   
-  min-width: 280px;
   max-width: 420px;
 
   display: flex;
@@ -82,4 +81,11 @@
 
 .buttons button:first-child:active {
   background: var(--secondary-active);
+}
+
+@media(max-width: 420px){
+  .modal{
+    width: 250px;
+    padding: 1rem 2rem;
+  }
 }

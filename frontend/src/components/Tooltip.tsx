@@ -40,7 +40,7 @@ export default function Tooltip({text, children}: TooltipProps){
 
   return (
     <span className={s.infoWrapper} ref={tooltipRef}>
-      <button
+      <div
       aria-label='Daha fazla bilgi'
       onClick={() => {
         if (isHovered) {
@@ -51,10 +51,9 @@ export default function Tooltip({text, children}: TooltipProps){
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      type='button'
       className={s.trigger}>
         {children}
-      </button>
+      </div>
       <span
         role='tooltip'
         id={tooltipId}

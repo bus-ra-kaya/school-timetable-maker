@@ -96,3 +96,20 @@
   width: 12px;
   height: 12px;
 }
+
+@media (max-width: 800px) {
+  .formContainer {
+    height: 22vh;
+  }
+}
+
+@media (max-width: 550px) {
+  input {
+    width: 90px;
+  }
+}
+@media (max-width: 450px) {
+  input {
+    width: 75px;
+  }
+}

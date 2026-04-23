@@ -9,7 +9,7 @@ import Tooltip from "./Tooltip";
 import Modal from "./Modal";
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
-import { validateData } from "../utils/validateData";
+import { validateData } from "../services/validateData";
 import { createSchedule } from "../services/createSchedule";
 import type { TeacherData, ClassData, ClassroomSchedule } from "../types";
 import s from "../style/ScheduleBuilder.module.css";
@@ -18,8 +18,9 @@ type ScheduleBuilderProps = {
   onScheduleCreated: (data: ClassroomSchedule[]) => void;
 }
 
-export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProps){
+//would probably be a good idea to separate this into smaller functions
 
+export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProps){
   // initialise teachers and classes, add the data to localStorage
 
   const [teachers, setTeachers] = useState<TeacherData[]>(() => {
@@ -201,7 +202,7 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
 
       <Tooltip text='Öğretmenleri ve sınıfları otomatik oluşturur.'>
         <button className={s.secondaryBtn} onClick={() => generateFormData()}>
-        <Dices aria-hidden='true' /> Rastgele doldur
+          <Dices aria-hidden='true' /> Rastgele doldur
         </button>
       </Tooltip>
     </div>

@@ -4,12 +4,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .main {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
   max-width: 900px;
   width: 100%;
@@ -29,6 +31,7 @@
 
 .pageContainer {
   display: flex;
+  justify-content: center;
   gap: 2rem;
 }
 
@@ -78,4 +81,10 @@ background-color: var(--info);
   clip: rect(0,0,0,0);
   clip-path: inset(50%);
   overflow-clip-margin: 0;
+}
+
+@media(max-width: 950px){
+  .pageContainer {
+    flex-direction: column;
+  }
 }

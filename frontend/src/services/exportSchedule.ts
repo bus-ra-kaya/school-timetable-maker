@@ -4,12 +4,18 @@ import '../assets/fonts/Sarala-Bold';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+type JsPDFWithAutoTable = jsPDF & {
+  lastAutoTable?: {
+    finalY: number;
+  };
+};
+
 const HOUR_COUNT = 8;
 const DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma'];
 
 export const exportSchedule = (schedule: ClassroomSchedule[]) => {
 
-  const doc = new jsPDF();
+  const doc = new jsPDF() as JsPDFWithAutoTable;
   doc.setFont('Sarala-Regular', 'normal');
   const pageWidth = doc.internal.pageSize.getWidth();
 

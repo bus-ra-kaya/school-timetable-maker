@@ -1,4 +1,4 @@
-import { Branches, Days, Grades} from "../generated/prisma/enums";
+import { Branches, Days, Grades} from "./generated/prisma/enums.js";
 
 export type lessonSlot = {
   name: string;

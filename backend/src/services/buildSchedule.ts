@@ -1,9 +1,9 @@
-import { Grades } from "../../../generated/prisma/enums";
-import { allSubjects, branchMap, gradeSpecificSubjects, MAX_HOURS_PER_TEACHER } from "../../data/subjects";
-import { prisma } from "../../prisma";
-import { TeacherWithLoad, Classroom, ScheduledLesson, Subject, SchedulePlan } from "../../types";
-import { shuffleArray } from "../../utils/shuffleArray";
-import { commitSlots, findAvailableSlots } from "./findAvailableSlots";
+import { Grades } from "../generated/prisma/enums.js";
+import { allSubjects, branchMap, gradeSpecificSubjects, MAX_HOURS_PER_TEACHER } from "../data/subjects.js";
+import { prisma } from "../prisma.js";
+import type { TeacherWithLoad, Classroom, ScheduledLesson, Subject, SchedulePlan } from "../types.js";
+import { shuffleArray } from "../utils/shuffleArray.js";
+import { commitSlots, findAvailableSlots } from "./findAvailableSlots.js";
 
 type SolverResult = {
   lessons: ScheduledLesson[];
@@ -22,7 +22,10 @@ const solveYear = (
 ):SolverResult | null => {
 
   if(yearIndex >= allYears.length) return {lessons: [], teachers, teacherSlots, classSlots};
+  
+  if(!allYears[yearIndex]) return null;
 
+  console.log(`--- Processing Year Group: ${allYears[yearIndex][0]?.year} ---`);
   const yearResult = solveClassroomList(
     0,
     allYears[yearIndex],
@@ -66,6 +69,8 @@ const solveClassroomList = (
   }
 
   const classroom = classrooms[classIndex];
+  if(!classroom) return null;
+
   const grade = classroom.year <= 4 ? 'elementary' : 'middle/high';
   const subjects = allSubjects.filter(s => s.grade === grade);
 
@@ -119,7 +124,17 @@ const solveSubjectsForClass = (
   }
 
   const subject = subjects[subjectIndex];
+  
+  if(!subject){
+    console.warn(`${subject} is not a valid subject!`);
+    return null;
+  }
   const branch = branchMap[subject.name];
+
+  if(!branch){
+    console.warn(`${branch} is not a valid branch!`);
+    return null;
+  }
   const branchTeachers = getBranchTeachers(currentTeachers, branch);
 
   for (const teacher of branchTeachers) {
@@ -140,6 +155,9 @@ const solveSubjectsForClass = (
       const index = currentTeachers.findIndex(t => t.id === teacher.id);
 
       const updatedTeachers = [...currentTeachers];
+      if(!updatedTeachers) return null;
+      if(!updatedTeachers[index]) return null;
+
       updatedTeachers[index] = {
         ...updatedTeachers[index],
         assignedHours: updatedTeachers[index].assignedHours + subject.hours,
@@ -173,8 +191,29 @@ const solveSubjectsForClass = (
 
 const getNewGrade = (teacher: TeacherWithLoad, subject: Subject) => {
   if (!gradeSpecificSubjects.some(s => s.name === subject.name)) return teacher.grade;
+  if(teacher.grade !== null) return teacher.grade;
   return subject.grade === 'elementary' ? Grades.ELEMENTARY : Grades.MIDDLE_HIGH;
 };
+
+const getBranchTeachers =  (teachers: TeacherWithLoad[], branch: string) => {
+  const branchTeachers =  teachers.filter(t => t.branch === branch);
+  return shuffleArray(branchTeachers);
+}
+
+const isTeacherEligible = (teacher: TeacherWithLoad, subject: Subject) => {
+  const canTeachFor = MAX_HOURS_PER_TEACHER - teacher.assignedHours;
+  if(canTeachFor < subject.hours) return false;
+
+  if(gradeSpecificSubjects.some(s => s.name === subject.name)) {
+    const subjectGrade = 
+      subject.grade === 'elementary'
+      ? Grades.ELEMENTARY
+      : Grades.MIDDLE_HIGH;
+
+    if(teacher.grade !== null && teacher.grade !== subjectGrade) return false;
+  }
+  return true;
+}
 
 const loadRequiredData = async (scheduleId: string) => {
   const [classrooms, rawTeachers] = await Promise.all([
@@ -198,25 +237,22 @@ const loadRequiredData = async (scheduleId: string) => {
   return {classrooms, teachers};
 }
 
-const getBranchTeachers =  (teachers: TeacherWithLoad[], branch: string) => {
-  const branchTeachers =  teachers.filter(t => t.branch === branch);
-  return shuffleArray(branchTeachers);
+
+const persistSchedule = async (plan: SchedulePlan) => {
+  await prisma.$transaction( async (tx) => {
+    await tx.lesson.createMany({data: plan.lessons});
+
+    await Promise.all(
+        plan.teacherHourUpdates.map(({ id, hours, grade }) =>
+        tx.teacher.update({
+          where: { id },
+          data: { hours, grade },
+        })
+      )
+    )
+  }, {timeout: 10000});
 }
 
-const isTeacherEligible = (teacher: TeacherWithLoad, subject: Subject) => {
-  const canTeachFor = MAX_HOURS_PER_TEACHER - teacher.assignedHours;
-  if(canTeachFor < subject.hours) return false;
-
-  if(gradeSpecificSubjects.some(s => s.name === subject.name)) {
-    const subjectGrade = 
-      subject.grade === 'elementary'
-      ? Grades.ELEMENTARY
-      : Grades.MIDDLE_HIGH;
-
-    if(teacher.grade !== null && teacher.grade !== subjectGrade) return false;
-  }
-  return true;
-}
 
 export const buildSchedule = async (scheduleId: string) => {
   const {classrooms, teachers} = await loadRequiredData(scheduleId);
@@ -254,18 +290,4 @@ export const buildSchedule = async (scheduleId: string) => {
     });
     return {result: true};
   }
-}
-const persistSchedule = async (plan: SchedulePlan) => {
-  await prisma.$transaction( async (tx) => {
-    await tx.lesson.createMany({data: plan.lessons});
-
-    await Promise.all(
-        plan.teacherHourUpdates.map(({ id, hours, grade }) =>
-        tx.teacher.update({
-          where: { id },
-          data: { hours, grade },
-        })
-      )
-    )
-  }, {timeout: 10000});
 }
