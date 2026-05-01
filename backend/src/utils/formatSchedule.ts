@@ -14,6 +14,7 @@ type ScheduleData = {
         day: Days;
     }[];
   name: string;
+  year: number;
   }[];
 };
 
@@ -21,7 +22,7 @@ export const formatSchedule = (scheduleData: ScheduleData) => {
 
   const hours = 8;
   const days = 5;
-  const formatted = scheduleData?.classrooms.map((classroom) => {
+  const formatted = [...(scheduleData?.classrooms ?? [])].sort((a,b) => a.year - b.year).map((classroom) => {
   const teacherMap: Record<string, 
   { name: string; 
     branch: string; 

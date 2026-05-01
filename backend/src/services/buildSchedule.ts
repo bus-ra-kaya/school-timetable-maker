@@ -1,5 +1,5 @@
 import { Grades } from "../generated/prisma/enums.js";
-import { allSubjects, branchMap, gradeSpecificSubjects, MAX_HOURS_PER_TEACHER } from "../data/subjects.js";
+import { allSubjects, branchMap, gradeSpecificSubjects} from "../data/subjects.js";
 import { prisma } from "../prisma.js";
 import type { TeacherWithLoad, Classroom, ScheduledLesson, Subject, SchedulePlan } from "../types.js";
 import { shuffleArray } from "../utils/shuffleArray.js";
@@ -18,7 +18,8 @@ const solveYear = (
   teachers: TeacherWithLoad[],
   teacherSlots: Set<string>,
   classSlots: Set<string>,
-  scheduleId: string
+  scheduleId: string,
+  maxHoursPerTeacher: number,
 ):SolverResult | null => {
 
   if(yearIndex >= allYears.length) return {lessons: [], teachers, teacherSlots, classSlots};
@@ -26,16 +27,23 @@ const solveYear = (
   if(!allYears[yearIndex]) return null;
 
   console.log(`--- Processing Year Group: ${allYears[yearIndex][0]?.year} ---`);
+
+  const yearClassrooms = [...allYears[yearIndex]].sort(() => Math.random() - 0.5);
+
   const yearResult = solveClassroomList(
     0,
-    allYears[yearIndex],
+    yearClassrooms,
     teachers, 
     teacherSlots, 
     classSlots,
-    scheduleId
+    scheduleId,
+    maxHoursPerTeacher
   );
 
-  if(!yearResult) return null;
+  if (!yearResult) {
+    console.warn(`Year ${yearIndex} failed. Retrying...`);
+    return null;
+  }
 
   const nextYearResult = solveYear(
     yearIndex +1,
@@ -43,7 +51,8 @@ const solveYear = (
     yearResult.teachers,
     yearResult.teacherSlots,
     yearResult.classSlots,
-    scheduleId
+    scheduleId,
+    maxHoursPerTeacher
   );
   
   if(!nextYearResult) return null;
@@ -63,6 +72,7 @@ const solveClassroomList = (
   teacherSlots: Set<string>,
   classSlots: Set<string>,
   scheduleId: string,
+  maxHoursPerTeacher: number,
 ): SolverResult | null => {
   if (classIndex >= classrooms.length) {
     return { lessons: [], teachers, teacherSlots, classSlots };
@@ -81,7 +91,8 @@ const solveClassroomList = (
     teachers, 
     teacherSlots, 
     classSlots, 
-    scheduleId
+    scheduleId,
+    maxHoursPerTeacher
   );
 
   if (!subjectsResult) return null;
@@ -92,7 +103,8 @@ const solveClassroomList = (
     subjectsResult.teachers,
     subjectsResult.teacherSlots,
     subjectsResult.classSlots,
-    scheduleId
+    scheduleId,
+    maxHoursPerTeacher
   );
 
   if (!nextClassResult) return null;
@@ -112,7 +124,8 @@ const solveSubjectsForClass = (
   currentTeachers: TeacherWithLoad[],
   currentTeacherSlots: Set<string>,
   currentClassSlots: Set<string>,
-  scheduleId: string
+  scheduleId: string,
+  maxHoursPerTeacher: number,
 ): SolverResult | null => {
   if (subjectIndex >= subjects.length) {
     return { 
@@ -138,7 +151,7 @@ const solveSubjectsForClass = (
   const branchTeachers = getBranchTeachers(currentTeachers, branch);
 
   for (const teacher of branchTeachers) {
-    if (!teacher || !isTeacherEligible(teacher, subject)) continue;
+    if (!teacher || !isTeacherEligible(teacher, subject, maxHoursPerTeacher)) continue;
 
     const slots = findAvailableSlots(teacher.id, classroom.id, {
       teacherSlots: currentTeacherSlots,
@@ -175,7 +188,8 @@ const solveSubjectsForClass = (
         updatedTeachers,
         nextTeacherSlots,
         nextClassSlots,
-        scheduleId
+        scheduleId,
+        maxHoursPerTeacher
       );
 
       if (result) {
@@ -200,8 +214,8 @@ const getBranchTeachers =  (teachers: TeacherWithLoad[], branch: string) => {
   return shuffleArray(branchTeachers);
 }
 
-const isTeacherEligible = (teacher: TeacherWithLoad, subject: Subject) => {
-  const canTeachFor = MAX_HOURS_PER_TEACHER - teacher.assignedHours;
+const isTeacherEligible = (teacher: TeacherWithLoad, subject: Subject, maxHoursPerTeacher: number) => {
+  const canTeachFor = maxHoursPerTeacher - teacher.assignedHours;
   if(canTeachFor < subject.hours) return false;
 
   if(gradeSpecificSubjects.some(s => s.name === subject.name)) {
@@ -250,15 +264,15 @@ const persistSchedule = async (plan: SchedulePlan) => {
         })
       )
     )
-  }, {timeout: 10000});
+  }, {timeout: 18000});
 }
 
 
-export const buildSchedule = async (scheduleId: string) => {
-  const {classrooms, teachers} = await loadRequiredData(scheduleId);
+export const buildSchedule = async (scheduleId: string, maxHoursPerTeacher: number) => {
+  const {classrooms: rawClassrooms, teachers: rawTeachers} = await loadRequiredData(scheduleId);
 
   const map = new Map<number, Classroom[]>();
-  for(const c of classrooms){
+  for(const c of rawClassrooms){
     if(!map.has(c.year)){
       map.set(c.year, []);
     }
@@ -266,28 +280,32 @@ export const buildSchedule = async (scheduleId: string) => {
   }
   const groupedClassrooms = Array.from(map.values());
 
-  const finalResult = solveYear(
-    0, 
-    groupedClassrooms, 
-    teachers, 
-    new Set<string>(), 
-    new Set<string>(),
-    scheduleId);
+  let attempts = 0;
+  const MAX_ATTEMPTS = 500;
 
-  if(!finalResult) {
-    console.log('Could not generate a valid schedule with these constraints');
-    return {result: false};
-  }
+  while (attempts < MAX_ATTEMPTS) {
 
-  if(finalResult) {
-    await persistSchedule({
-      lessons: finalResult.lessons,
-      teacherHourUpdates: finalResult.teachers.map(t => ({
+  const classrooms = shuffleArray(groupedClassrooms);
+  const teachers = shuffleArray(rawTeachers);
+    
+    const result = solveYear(0, classrooms, teachers, new Set(), new Set(), scheduleId, maxHoursPerTeacher);
+
+    if (result) {
+      await persistSchedule({
+      lessons: result.lessons,
+      teacherHourUpdates: result.teachers.map(t => ({
         id: t.id,
         hours: t.assignedHours,
         grade: t.grade
       }))
     });
     return {result: true};
+    }
+
+    console.log(`Attempt ${attempts} failed. Restarting from Year 0...`);
+    attempts++;
   }
+
+  return {result: false};
+
 }

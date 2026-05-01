@@ -20,40 +20,76 @@ export type scheduleModel = runtime.Types.Result.DefaultSelection<Prisma.$schedu
 
 export type AggregateSchedule = {
   _count: ScheduleCountAggregateOutputType | null
+  _avg: ScheduleAvgAggregateOutputType | null
+  _sum: ScheduleSumAggregateOutputType | null
   _min: ScheduleMinAggregateOutputType | null
   _max: ScheduleMaxAggregateOutputType | null
+}
+
+export type ScheduleAvgAggregateOutputType = {
+  hoursPerTeacher: number | null
+}
+
+export type ScheduleSumAggregateOutputType = {
+  hoursPerTeacher: number | null
 }
 
 export type ScheduleMinAggregateOutputType = {
   id: string | null
   createdAt: Date | null
+  hoursPerTeacher: number | null
+  school: string | null
+  program: string | null
 }
 
 export type ScheduleMaxAggregateOutputType = {
   id: string | null
   createdAt: Date | null
+  hoursPerTeacher: number | null
+  school: string | null
+  program: string | null
 }
 
 export type ScheduleCountAggregateOutputType = {
   id: number
   createdAt: number
+  hoursPerTeacher: number
+  school: number
+  program: number
   _all: number
 }
 
 
+export type ScheduleAvgAggregateInputType = {
+  hoursPerTeacher?: true
+}
+
+export type ScheduleSumAggregateInputType = {
+  hoursPerTeacher?: true
+}
+
 export type ScheduleMinAggregateInputType = {
   id?: true
   createdAt?: true
+  hoursPerTeacher?: true
+  school?: true
+  program?: true
 }
 
 export type ScheduleMaxAggregateInputType = {
   id?: true
   createdAt?: true
+  hoursPerTeacher?: true
+  school?: true
+  program?: true
 }
 
 export type ScheduleCountAggregateInputType = {
   id?: true
   createdAt?: true
+  hoursPerTeacher?: true
+  school?: true
+  program?: true
   _all?: true
 }
 
@@ -95,6 +131,18 @@ export type ScheduleAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ScheduleAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ScheduleSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ScheduleMinAggregateInputType
@@ -125,6 +173,8 @@ export type scheduleGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: ScheduleCountAggregateInputType | true
+  _avg?: ScheduleAvgAggregateInputType
+  _sum?: ScheduleSumAggregateInputType
   _min?: ScheduleMinAggregateInputType
   _max?: ScheduleMaxAggregateInputType
 }
@@ -132,7 +182,12 @@ export type scheduleGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type ScheduleGroupByOutputType = {
   id: string
   createdAt: Date
+  hoursPerTeacher: number
+  school: string | null
+  program: string | null
   _count: ScheduleCountAggregateOutputType | null
+  _avg: ScheduleAvgAggregateOutputType | null
+  _sum: ScheduleSumAggregateOutputType | null
   _min: ScheduleMinAggregateOutputType | null
   _max: ScheduleMaxAggregateOutputType | null
 }
@@ -158,6 +213,9 @@ export type scheduleWhereInput = {
   NOT?: Prisma.scheduleWhereInput | Prisma.scheduleWhereInput[]
   id?: Prisma.StringFilter<"schedule"> | string
   createdAt?: Prisma.DateTimeFilter<"schedule"> | Date | string
+  hoursPerTeacher?: Prisma.IntFilter<"schedule"> | number
+  school?: Prisma.StringNullableFilter<"schedule"> | string | null
+  program?: Prisma.StringNullableFilter<"schedule"> | string | null
   teachers?: Prisma.TeacherListRelationFilter
   classrooms?: Prisma.ClassroomListRelationFilter
   lessons?: Prisma.LessonListRelationFilter
@@ -166,6 +224,9 @@ export type scheduleWhereInput = {
 export type scheduleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  hoursPerTeacher?: Prisma.SortOrder
+  school?: Prisma.SortOrderInput | Prisma.SortOrder
+  program?: Prisma.SortOrderInput | Prisma.SortOrder
   teachers?: Prisma.teacherOrderByRelationAggregateInput
   classrooms?: Prisma.classroomOrderByRelationAggregateInput
   lessons?: Prisma.lessonOrderByRelationAggregateInput
@@ -177,6 +238,9 @@ export type scheduleWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.scheduleWhereInput[]
   NOT?: Prisma.scheduleWhereInput | Prisma.scheduleWhereInput[]
   createdAt?: Prisma.DateTimeFilter<"schedule"> | Date | string
+  hoursPerTeacher?: Prisma.IntFilter<"schedule"> | number
+  school?: Prisma.StringNullableFilter<"schedule"> | string | null
+  program?: Prisma.StringNullableFilter<"schedule"> | string | null
   teachers?: Prisma.TeacherListRelationFilter
   classrooms?: Prisma.ClassroomListRelationFilter
   lessons?: Prisma.LessonListRelationFilter
@@ -185,9 +249,14 @@ export type scheduleWhereUniqueInput = Prisma.AtLeast<{
 export type scheduleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  hoursPerTeacher?: Prisma.SortOrder
+  school?: Prisma.SortOrderInput | Prisma.SortOrder
+  program?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.scheduleCountOrderByAggregateInput
+  _avg?: Prisma.scheduleAvgOrderByAggregateInput
   _max?: Prisma.scheduleMaxOrderByAggregateInput
   _min?: Prisma.scheduleMinOrderByAggregateInput
+  _sum?: Prisma.scheduleSumOrderByAggregateInput
 }
 
 export type scheduleScalarWhereWithAggregatesInput = {
@@ -196,11 +265,17 @@ export type scheduleScalarWhereWithAggregatesInput = {
   NOT?: Prisma.scheduleScalarWhereWithAggregatesInput | Prisma.scheduleScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"schedule"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"schedule"> | Date | string
+  hoursPerTeacher?: Prisma.IntWithAggregatesFilter<"schedule"> | number
+  school?: Prisma.StringNullableWithAggregatesFilter<"schedule"> | string | null
+  program?: Prisma.StringNullableWithAggregatesFilter<"schedule"> | string | null
 }
 
 export type scheduleCreateInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherCreateNestedManyWithoutScheduleInput
   classrooms?: Prisma.classroomCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonCreateNestedManyWithoutScheduleInput
@@ -209,6 +284,9 @@ export type scheduleCreateInput = {
 export type scheduleUncheckedCreateInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherUncheckedCreateNestedManyWithoutScheduleInput
   classrooms?: Prisma.classroomUncheckedCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonUncheckedCreateNestedManyWithoutScheduleInput
@@ -217,6 +295,9 @@ export type scheduleUncheckedCreateInput = {
 export type scheduleUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUpdateManyWithoutScheduleNestedInput
   classrooms?: Prisma.classroomUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUpdateManyWithoutScheduleNestedInput
@@ -225,6 +306,9 @@ export type scheduleUpdateInput = {
 export type scheduleUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUncheckedUpdateManyWithoutScheduleNestedInput
   classrooms?: Prisma.classroomUncheckedUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUncheckedUpdateManyWithoutScheduleNestedInput
@@ -233,31 +317,57 @@ export type scheduleUncheckedUpdateInput = {
 export type scheduleCreateManyInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
 }
 
 export type scheduleUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type scheduleUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type scheduleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  hoursPerTeacher?: Prisma.SortOrder
+  school?: Prisma.SortOrder
+  program?: Prisma.SortOrder
+}
+
+export type scheduleAvgOrderByAggregateInput = {
+  hoursPerTeacher?: Prisma.SortOrder
 }
 
 export type scheduleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  hoursPerTeacher?: Prisma.SortOrder
+  school?: Prisma.SortOrder
+  program?: Prisma.SortOrder
 }
 
 export type scheduleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  hoursPerTeacher?: Prisma.SortOrder
+  school?: Prisma.SortOrder
+  program?: Prisma.SortOrder
+}
+
+export type scheduleSumOrderByAggregateInput = {
+  hoursPerTeacher?: Prisma.SortOrder
 }
 
 export type ScheduleScalarRelationFilter = {
@@ -271,6 +381,18 @@ export type StringFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type scheduleCreateNestedOneWithoutTeachersInput = {
@@ -318,6 +440,9 @@ export type scheduleUpdateOneRequiredWithoutLessonsNestedInput = {
 export type scheduleCreateWithoutTeachersInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   classrooms?: Prisma.classroomCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonCreateNestedManyWithoutScheduleInput
 }
@@ -325,6 +450,9 @@ export type scheduleCreateWithoutTeachersInput = {
 export type scheduleUncheckedCreateWithoutTeachersInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   classrooms?: Prisma.classroomUncheckedCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonUncheckedCreateNestedManyWithoutScheduleInput
 }
@@ -348,6 +476,9 @@ export type scheduleUpdateToOneWithWhereWithoutTeachersInput = {
 export type scheduleUpdateWithoutTeachersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classrooms?: Prisma.classroomUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUpdateManyWithoutScheduleNestedInput
 }
@@ -355,6 +486,9 @@ export type scheduleUpdateWithoutTeachersInput = {
 export type scheduleUncheckedUpdateWithoutTeachersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   classrooms?: Prisma.classroomUncheckedUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUncheckedUpdateManyWithoutScheduleNestedInput
 }
@@ -362,6 +496,9 @@ export type scheduleUncheckedUpdateWithoutTeachersInput = {
 export type scheduleCreateWithoutClassroomsInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonCreateNestedManyWithoutScheduleInput
 }
@@ -369,6 +506,9 @@ export type scheduleCreateWithoutClassroomsInput = {
 export type scheduleUncheckedCreateWithoutClassroomsInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherUncheckedCreateNestedManyWithoutScheduleInput
   lessons?: Prisma.lessonUncheckedCreateNestedManyWithoutScheduleInput
 }
@@ -392,6 +532,9 @@ export type scheduleUpdateToOneWithWhereWithoutClassroomsInput = {
 export type scheduleUpdateWithoutClassroomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUpdateManyWithoutScheduleNestedInput
 }
@@ -399,6 +542,9 @@ export type scheduleUpdateWithoutClassroomsInput = {
 export type scheduleUncheckedUpdateWithoutClassroomsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUncheckedUpdateManyWithoutScheduleNestedInput
   lessons?: Prisma.lessonUncheckedUpdateManyWithoutScheduleNestedInput
 }
@@ -406,6 +552,9 @@ export type scheduleUncheckedUpdateWithoutClassroomsInput = {
 export type scheduleCreateWithoutLessonsInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherCreateNestedManyWithoutScheduleInput
   classrooms?: Prisma.classroomCreateNestedManyWithoutScheduleInput
 }
@@ -413,6 +562,9 @@ export type scheduleCreateWithoutLessonsInput = {
 export type scheduleUncheckedCreateWithoutLessonsInput = {
   id?: string
   createdAt?: Date | string
+  hoursPerTeacher?: number
+  school?: string | null
+  program?: string | null
   teachers?: Prisma.teacherUncheckedCreateNestedManyWithoutScheduleInput
   classrooms?: Prisma.classroomUncheckedCreateNestedManyWithoutScheduleInput
 }
@@ -436,6 +588,9 @@ export type scheduleUpdateToOneWithWhereWithoutLessonsInput = {
 export type scheduleUpdateWithoutLessonsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUpdateManyWithoutScheduleNestedInput
   classrooms?: Prisma.classroomUpdateManyWithoutScheduleNestedInput
 }
@@ -443,6 +598,9 @@ export type scheduleUpdateWithoutLessonsInput = {
 export type scheduleUncheckedUpdateWithoutLessonsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoursPerTeacher?: Prisma.IntFieldUpdateOperationsInput | number
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  program?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachers?: Prisma.teacherUncheckedUpdateManyWithoutScheduleNestedInput
   classrooms?: Prisma.classroomUncheckedUpdateManyWithoutScheduleNestedInput
 }
@@ -499,6 +657,9 @@ export type ScheduleCountOutputTypeCountLessonsArgs<ExtArgs extends runtime.Type
 export type scheduleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   createdAt?: boolean
+  hoursPerTeacher?: boolean
+  school?: boolean
+  program?: boolean
   teachers?: boolean | Prisma.schedule$teachersArgs<ExtArgs>
   classrooms?: boolean | Prisma.schedule$classroomsArgs<ExtArgs>
   lessons?: boolean | Prisma.schedule$lessonsArgs<ExtArgs>
@@ -508,19 +669,28 @@ export type scheduleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type scheduleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   createdAt?: boolean
+  hoursPerTeacher?: boolean
+  school?: boolean
+  program?: boolean
 }, ExtArgs["result"]["schedule"]>
 
 export type scheduleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   createdAt?: boolean
+  hoursPerTeacher?: boolean
+  school?: boolean
+  program?: boolean
 }, ExtArgs["result"]["schedule"]>
 
 export type scheduleSelectScalar = {
   id?: boolean
   createdAt?: boolean
+  hoursPerTeacher?: boolean
+  school?: boolean
+  program?: boolean
 }
 
-export type scheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt", ExtArgs["result"]["schedule"]>
+export type scheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "hoursPerTeacher" | "school" | "program", ExtArgs["result"]["schedule"]>
 export type scheduleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teachers?: boolean | Prisma.schedule$teachersArgs<ExtArgs>
   classrooms?: boolean | Prisma.schedule$classroomsArgs<ExtArgs>
@@ -540,6 +710,9 @@ export type $schedulePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     createdAt: Date
+    hoursPerTeacher: number
+    school: string | null
+    program: string | null
   }, ExtArgs["result"]["schedule"]>
   composites: {}
 }
@@ -968,6 +1141,9 @@ export interface Prisma__scheduleClient<T, Null = never, ExtArgs extends runtime
 export interface scheduleFieldRefs {
   readonly id: Prisma.FieldRef<"schedule", 'String'>
   readonly createdAt: Prisma.FieldRef<"schedule", 'DateTime'>
+  readonly hoursPerTeacher: Prisma.FieldRef<"schedule", 'Int'>
+  readonly school: Prisma.FieldRef<"schedule", 'String'>
+  readonly program: Prisma.FieldRef<"schedule", 'String'>
 }
     
 

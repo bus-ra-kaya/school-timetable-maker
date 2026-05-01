@@ -5,7 +5,6 @@ const ELEMENTARY_GRADES = [1,2,3,4];
 const MIDDLE_HIGH_GRADES = [5,6,7,8,9,10,11,12];
 const GRADE_COUNT = 12;
 const BRANCH_COUNT = 3;
-const MAX_HOURS_PER_TEACHER = 24;
 const CAN_TEACH_ALL_GRADES = new Set([ "Resim","Müzik","Beden Eğitimi","Satranç"]);
 
 type ValidationResult = {
@@ -13,7 +12,7 @@ type ValidationResult = {
   error: string | null;
 }
 
-export function validateData (teachers: TeacherData[], classes: ClassData[]):ValidationResult{
+export function validateData (teachers: TeacherData[], classes: ClassData[], maxHours: number):ValidationResult{
   
   // checking if all classes are in order
   if(classes.length < GRADE_COUNT * BRANCH_COUNT){
@@ -30,7 +29,7 @@ export function validateData (teachers: TeacherData[], classes: ClassData[]):Val
     return {result: false, error: `${GRADE_COUNT} yıl için de ${BRANCH_COUNT}'er şube olacak şekilde eksik sınıfları ekleyiniz.`};
   }
 
-  const shortages = checkTeacherShortages(teachers);
+  const shortages = checkTeacherShortages(teachers, maxHours);
 
   if(shortages.length > 0){
     return {result: false, error: `${shortages.join(', ')} dersleri için eksik öğretmenler bulunmaktadır.`};
@@ -60,7 +59,7 @@ const hasAllGrades = (classes: ClassData[]): boolean => {
   return true;
 }
 
-const checkTeacherShortages = (teachers: TeacherData[]) => {
+const checkTeacherShortages = (teachers: TeacherData[], maxHoursPerTeacher: number) => {
   const shortages = new Set<string>();
   const countByBranch = teachers.reduce<Record<string, number>>(
     (acc, teacher) => {
@@ -75,7 +74,7 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
 
   multiGradeSubjects.forEach(s => {
     const needed = GRADE_COUNT * BRANCH_COUNT;
-    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const canTeach = Math.floor(maxHoursPerTeacher / s.hours);
     const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
     if(totalCapacity < needed){
@@ -86,7 +85,7 @@ const checkTeacherShortages = (teachers: TeacherData[]) => {
   gradeSpecificSubjects.forEach(s => {
     const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
     const needed = gradeCount * BRANCH_COUNT;
-    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const canTeach = Math.floor(maxHoursPerTeacher / s.hours);
     const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
     if(totalCapacity < needed){

@@ -41,12 +41,20 @@ enum Days {
 // debate adding contstraint to the hours teacher hours
 
 model schedule {
-  id          String      @id @default(cuid())
-  createdAt   DateTime    @default(now())
+  id              String      @id @default(cuid())
+  createdAt       DateTime    @default(now())
+  hoursPerTeacher Int         @default(24)
+  school          String?
+  program         String?
   
-  teachers    teacher[]
-  classrooms  classroom[]
-  lessons     lesson[]
+  teachers      teacher[]
+  classrooms    classroom[]
+  lessons       lesson[]
+}
+
+model Settings {
+  id                 Int @id @default(1)
+  maxHoursPerTeacher Int @default(24)
 }
 
 model teacher {

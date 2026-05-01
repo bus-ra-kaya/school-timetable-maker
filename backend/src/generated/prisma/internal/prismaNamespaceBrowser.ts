@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   schedule: 'schedule',
+  Settings: 'Settings',
   teacher: 'teacher',
   classroom: 'classroom',
   lesson: 'lesson'
@@ -75,10 +76,21 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const ScheduleScalarFieldEnum = {
   id: 'id',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  hoursPerTeacher: 'hoursPerTeacher',
+  school: 'school',
+  program: 'program'
 } as const
 
 export type ScheduleScalarFieldEnum = (typeof ScheduleScalarFieldEnum)[keyof typeof ScheduleScalarFieldEnum]
+
+
+export const SettingsScalarFieldEnum = {
+  id: 'id',
+  maxHoursPerTeacher: 'maxHoursPerTeacher'
+} as const
+
+export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
 
 
 export const TeacherScalarFieldEnum = {
