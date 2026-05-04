@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type schedule = Prisma.scheduleModel
 /**
+ * Model Settings
+ * 
+ */
+export type Settings = Prisma.SettingsModel
+/**
  * Model teacher
  * 
  */

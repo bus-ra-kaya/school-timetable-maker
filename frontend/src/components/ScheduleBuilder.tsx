@@ -6,7 +6,6 @@ import ProfBranchForm from "./Form/ProfBranchForm";
 import ClassForm from "./Form/ClassForm";
 import Toast from "./Toast";
 import Tooltip from "./Tooltip";
-import Modal from "./Modal";
 import { getRandomName } from "../utils/getRandomName";
 import { getRandomData } from "../utils/getRandomData";
 import { validateData } from "../services/validateData";
@@ -16,11 +15,12 @@ import s from "../style/ScheduleBuilder.module.css";
 
 type ScheduleBuilderProps = {
   onScheduleCreated: (data: ClassroomSchedule[]) => void;
+  maxHours: number,
 }
 
 //would probably be a good idea to separate this into smaller functions
 
-export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProps){
+export default function ScheduleBuilder({onScheduleCreated, maxHours}: ScheduleBuilderProps){
   // initialise teachers and classes, add the data to localStorage
 
   const [teachers, setTeachers] = useState<TeacherData[]>(() => {
@@ -86,23 +86,13 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
   // form submit logic
 
   const navigate = useNavigate();
-  const [open, setOpen] = useState<boolean>(false);
 
-  const scheduleCheck = () => {
-    const schedule = localStorage.getItem('schedule');
-    if(schedule){
-      setOpen(true);
-    }
-    else {
-      onSubmit();
-    }
-  }
   const onSubmit = async () => {
 
     setToast(null);
     setIsLoading(true);
 
-    const {result, error: validationError} = validateData(teachers, classes);
+    const {result, error: validationError} = validateData(teachers, classes, maxHours ?? 24);
     if(!result && validationError){
       setToast({message: validationError, type: 'error'});
       setIsLoading(false);
@@ -111,7 +101,7 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
 
     try {
       const [schedule] = await Promise.all([
-        createSchedule(teachers, classes),
+        createSchedule(teachers, classes, maxHours),
         new Promise(resolve => setTimeout(resolve, 1000))
       ]);
 
@@ -142,23 +132,9 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
   // generate random data
 
   const generateFormData = () => {
-    const {teachers, classes} = getRandomData();
+    const {teachers, classes} = getRandomData(maxHours);
     setTeachers(teachers);
     setClasses(classes);
-  }
-
-  //refocus the trigger button when the modal closes
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  const handleCancel = () => {
-    setOpen(false);
-    triggerRef.current?.focus();
-  };
-
-  const handleConfirm = () => {
-    setOpen(false);
-    triggerRef.current?.focus();
-    onSubmit();
   }
 
   return(
@@ -187,10 +163,9 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
       </div>
 
       <div className={s.btnContainer}>
-      <button 
-        ref={triggerRef}
+      <button
         onClick={() => {
-          if (!isLoading && isFormChanged) scheduleCheck();
+          if (!isLoading && isFormChanged) onSubmit();
         }}
         className={s.primaryBtn}
         aria-disabled={isLoading || !isFormChanged}
@@ -216,12 +191,6 @@ export default function ScheduleBuilder({onScheduleCreated}: ScheduleBuilderProp
       />
     )}
     </div>
-
-    {open && (
-      <Modal onConfirm={handleConfirm} onCancel={handleCancel}>
-        <p>Sistemde kayıtlı bir program bulunmaktadır. Yenisini oluşturmak istediğinize emin misiniz?</p>
-      </Modal>
-    )}
     </>
   )
 }

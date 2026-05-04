@@ -27,6 +27,7 @@ router.post('/api/schedule', async (req, res) => {
         classrooms: {
           select: {
             name: true,
+            year: true,
             lessons: {
               select: {
                 teacher: {

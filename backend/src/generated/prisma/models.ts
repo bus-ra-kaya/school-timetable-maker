@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/schedule.js'
+export type * from './models/Settings.js'
 export type * from './models/teacher.js'
 export type * from './models/classroom.js'
 export type * from './models/lesson.js'

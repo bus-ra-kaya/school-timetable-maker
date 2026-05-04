@@ -4,11 +4,29 @@ import Schedule from './components/Schedule/Schedule';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 import {Routes, Route} from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ScheduleList from './components/ScheduleList';
+import Settings from './components/Settings';
+import { fetchSettings } from './services/fetchSettings';
 
 function App() {
   const [toast, setToast] = useState<boolean>(false);
+
+  const [maxHours, setMaxHours] = useState<number>(24);
+  const [fetching, setFetching] = useState<boolean>(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setFetching(true);
+        const { data } = await fetchSettings();
+        if (data) setMaxHours(data);
+      } finally {
+        setFetching(false);
+      }
+    };
+    load();
+  }, []);
 
   const builderElement = (
     <div className="pageContainer">
@@ -17,7 +35,9 @@ function App() {
         onScheduleCreated={() => {
           setToast(true);
         }}
+        maxHours={maxHours}
       />
+      <Settings maxHours={maxHours} setMaxHours={setMaxHours} fetching={fetching}/>
     </div>
   );
 

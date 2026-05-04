@@ -38,6 +38,6 @@ export const fetchSchedule = async (scheduleId: string): Promise<ReturnValue> =>
     if( NODE_MODE === 'development'){
       console.log(err);
     }
-    return {data: null, error: 'Sistemsel bir hata yaşandı. Lütfen daha sonra tekrar deneyiniz.'};
+    return {data: null, error: 'Program bulunamadı. Lütfen daha sonra tekrar deneyiniz.'};
   }
 }

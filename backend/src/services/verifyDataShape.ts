@@ -1,6 +1,6 @@
 import { Branches, Grades } from '../generated/prisma/enums.js';
 import type { TeacherData, ClassData } from '../types.js';
-import { ELEMENTARY_GRADES, MIDDLE_HIGH_GRADES, GRADE_COUNT, BRANCH_COUNT, MAX_HOURS_PER_TEACHER, gradeSpecificSubjects, multiGradeSubjects, branchMap  } from "../data/subjects.js";
+import { ELEMENTARY_GRADES, MIDDLE_HIGH_GRADES, GRADE_COUNT, BRANCH_COUNT, gradeSpecificSubjects, multiGradeSubjects, branchMap  } from "../data/subjects.js";
 
 export function isTeacherDataArray(arr: unknown): arr is TeacherData[] {
   return Array.isArray(arr) && arr.every(t => {
@@ -39,7 +39,7 @@ export const hasAllGrades = (classes: ClassData[]): boolean => {
   return true;
 }
 
-export const hasAllTeachers = (teachers: TeacherData[]) => {
+export const hasAllTeachers = (teachers: TeacherData[], maxHoursPerTeacher: number) => {
 
   const countByBranch = teachers.reduce<Record<string, number>>(
     (acc, teacher) => {
@@ -49,7 +49,7 @@ export const hasAllTeachers = (teachers: TeacherData[]) => {
   
   multiGradeSubjects.forEach(s => {
       const needed = GRADE_COUNT * BRANCH_COUNT;
-      const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+      const canTeach = Math.floor(maxHoursPerTeacher / s.hours);
       const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
       if(totalCapacity < needed){
@@ -60,7 +60,7 @@ export const hasAllTeachers = (teachers: TeacherData[]) => {
   gradeSpecificSubjects.forEach(s => {
     const gradeCount = s.grade === 'elementary' ? ELEMENTARY_GRADES.length : MIDDLE_HIGH_GRADES.length;
     const needed = gradeCount * BRANCH_COUNT;
-    const canTeach = Math.floor(MAX_HOURS_PER_TEACHER / s.hours);
+    const canTeach = Math.floor(maxHoursPerTeacher / s.hours);
     const totalCapacity = (countByBranch[s.name] ?? 0) * canTeach;
 
     if(totalCapacity < needed){

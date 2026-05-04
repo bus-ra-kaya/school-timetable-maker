@@ -57,6 +57,7 @@
   font-size: 0.9rem;
   flex: 1;
   min-width: 0;
+  text-align: start;
 }
 
 .fieldset select {

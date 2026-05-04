@@ -1,0 +1,119 @@
+.settings {
+  background-color: var(--bg);
+  height: 42px;
+  padding: 0.5rem;
+  color: var(--text);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  box-shadow: 0px 3px 9px rgba(0, 0, 0, 0.1);
+}
+
+.settings svg {
+  height: 25px;
+  width: 25px;
+}
+
+.settings:hover {
+  background-color: var(--secondary-hover);
+}
+
+.settings:active {
+  background-color: var(--secondary-active);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--bg);
+  border-radius: 16px;
+  width: 360px;
+  padding: 1rem 2rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.closeBtn {
+  background: none;
+  border: 1px solid var(--border);
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn svg {
+  color: var(--text);
+}
+
+.body {
+  padding: 20px;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+input {
+  width: 4rem;
+  padding: 0.4rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.cancelBtn {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--text);
+  color: var(--text);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.saveBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}

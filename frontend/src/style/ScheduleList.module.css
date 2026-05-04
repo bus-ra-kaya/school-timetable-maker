@@ -79,11 +79,17 @@ h2 {
   .listContainer{
     width: 400px;
   }
+  .placeholder {
+    width: 300px;
+  }
 }
 
 @media (max-width: 500px){
   .listContainer{
     width: 350px;
+  }
+  .placeholder {
+    width: 250px;
   }
 }
 

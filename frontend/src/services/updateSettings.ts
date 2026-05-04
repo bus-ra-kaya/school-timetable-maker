@@ -1,23 +1,18 @@
-import type { TeacherData, ClassData, ClassroomSchedule } from "../types";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const NODE_MODE = import.meta.env.NODE_ENV;
 
 type ReturnValue = {
-  data: {
-    schedule: ClassroomSchedule[], 
-    scheduleId: string
-   }| null;
+  data: number | null;
   error: string | null;
 }
 
-export const createSchedule = async (teachers: TeacherData[], classes: ClassData[], maxHoursPerTeacher: number): Promise<ReturnValue> => {
+export const updateSettings = async (maxHoursPerTeacher: number) :Promise<ReturnValue> => {
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/create-schedule`, {
-    method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/api/settings`, {
+    method: 'PUT',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({teachers, classes, maxHoursPerTeacher})
+    body: JSON.stringify({maxHoursPerTeacher})
    });
 
     if(!response.ok){
@@ -37,6 +32,6 @@ export const createSchedule = async (teachers: TeacherData[], classes: ClassData
     if( NODE_MODE === 'development'){
       console.log(err);
     }
-    return {data: null, error: 'Program oluşturulamadı. Lütfen daha sonra tekrar deneyiniz.'};
+    return {data: null, error: 'Ayarlar güncellenilemedi. Lütfen daha sonra tekrar deneyiniz.'};
   }
 }
